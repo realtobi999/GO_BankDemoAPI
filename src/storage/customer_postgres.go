@@ -1,19 +1,19 @@
 package storage
 
-import (
-	"time"
+import "github.com/realtobi999/GO_BankDemoApi/src/types"
 
-	"github.com/beevik/guid"
-)
+func (p *Postgres) CreateCustomer(customer types.Customer) (int64, error) {
+    query := `INSERT INTO customers (id, first_name, last_name, birthday, email, phone, state, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-type Customer struct {
-	ID        guid.Guid
-	FirstName string
-	LastName  string
-	Birthday  time.Time
-	Email     string
-	Phone     string
-	State     string
-	Address   string
-	Accounts  []Account
+    result, err := p.DB.Exec(query, customer.ID.String(), customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address)
+    if err != nil {
+        return 0, err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return 0, err
+    }
+
+    return rowsAffected, nil
 }

@@ -3,8 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
 type SuccessResponse struct {
@@ -16,6 +14,12 @@ type SuccessResponse struct {
 type ErrorResponse struct {
 	ErrorMessage string `json:"error_message"`
 	Code         int    `json:"code"`
+}
+
+type multipleErrorResponse struct {
+	Message string  `json:"message"`
+	Status  int     `json:"status"`
+	Errors  []string `json:"errors"`
 }
 
 func RespondWithJson(w http.ResponseWriter, code int, payload any) error {
@@ -31,7 +35,7 @@ func RespondWithJson(w http.ResponseWriter, code int, payload any) error {
 	return json.NewEncoder(w).Encode(response)
 }
 
-func RespondWithError(w http.ResponseWriter, logger types.ILogger, code int, message string) error {
+func RespondWithError(w http.ResponseWriter, code int, message string) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 
@@ -40,7 +44,24 @@ func RespondWithError(w http.ResponseWriter, logger types.ILogger, code int, mes
 		ErrorMessage: message,
 	}
 
-	logger.LogError(message)
+	return json.NewEncoder(w).Encode(response)
+}
+
+func RespondWithValidationErrors(w http.ResponseWriter, code int, message string, errs []error) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+
+	// Convert errors to string slice
+	var errorStrings []string
+	for _, err := range errs {
+		errorStrings = append(errorStrings, err.Error())
+	}
+
+	response := multipleErrorResponse{
+		Message: message,
+		Status:  code,
+		Errors:  errorStrings,
+	}
 
 	return json.NewEncoder(w).Encode(response)
 }
