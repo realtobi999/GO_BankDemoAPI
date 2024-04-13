@@ -6,3 +6,7 @@ type ILogger interface {
 	LogDebug(message any)
 	LogWarning(message any)
 }
+
+type IStorage interface {
+	DatabaseHas(table, column string, value any) bool
+}
