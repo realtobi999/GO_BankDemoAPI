@@ -1,14 +1,15 @@
 package api
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	h "github.com/realtobi999/GO_BankDemoApi/src/handlers"
+	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
-type HandlerFunc func(http.ResponseWriter, *http.Request)
+type HandlerFunc func(http.ResponseWriter, *http.Request, types.ILogger)
 
 
 func (s *Server) loadRoutes() {
@@ -22,7 +23,7 @@ func (s *Server) setupRouter() {
 
 func (s *Server) handler(handlerFunc HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[INFO]\tRequest received: %s %s", r.Method, r.URL.Path)
-		handlerFunc(w, r)
+		s.Logger.LogEvent(fmt.Sprintf("Request received: %s %s", r.Method, r.URL.Path))
+		handlerFunc(w, r, s.Logger)
 	}
 }

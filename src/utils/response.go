@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
@@ -21,7 +20,7 @@ func RespondWithJson(w http.ResponseWriter, code int, payload any) error {
 	return json.NewEncoder(w).Encode(response)
 }
 
-func RespondWithError(w http.ResponseWriter, code int, message string) error {
+func RespondWithError(w http.ResponseWriter, logger types.ILogger, code int, message string) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 
@@ -30,7 +29,7 @@ func RespondWithError(w http.ResponseWriter, code int, message string) error {
 		ErrorMessage: message,
 	}
 
-	log.Println("[ERROR]\t" + message)
+	logger.LogError(message);
 
 	return json.NewEncoder(w).Encode(response)
 }

@@ -5,16 +5,19 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
 type Server struct {
 	Port   int
 	Router *chi.Mux
+	Logger types.ILogger
 }
 
-func NewServer(port int) Server {
+func NewServer(port int, logger types.ILogger) Server {
 	return Server{
 		Port: port,
+		Logger:  logger,
 	}
 }
 

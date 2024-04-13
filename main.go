@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 
 	"github.com/joho/godotenv"
 	"github.com/realtobi999/GO_BankDemoApi/src/api"
+	"github.com/realtobi999/GO_BankDemoApi/src/utils/logs"
 )
 func main() {
 	clearConsole()
@@ -24,8 +26,11 @@ func main() {
 		log.Fatal("[Error] - Error parsing port from the .env file")
 	}
 
-	server := api.NewServer(port)
+	// Initiate the logger
+	logger := logs.NewLogger(`src\utils\logs\logs.txt`)
 
-	log.Printf("[*] - Server successfully started on port : %v\n", server.Port)
+	server := api.NewServer(port, logger)
+
+	logger.LogEvent(fmt.Sprintf("Server successfully started on port : %v", server.Port))
 	log.Fatal(server.Run())
 }
