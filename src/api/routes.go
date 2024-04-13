@@ -15,6 +15,12 @@ type HandlerFunc func(http.ResponseWriter, *http.Request, types.ILogger, types.I
 func (s *Server) loadRoutes() {
 	s.Router.Get("/api/health", s.handler(h.HealthTestHandler))
 	s.Router.Get("/api/error", s.handler(h.ErrorTestHandler))
+
+	s.Router.Get("/api/customer", s.handler(h.IndexCustomerHandler))
+	s.Router.Get("/api/customer/{id}", s.handler(h.GetCustomerHandler))
+	s.Router.Post("/api/customer", s.handler(h.CreateCustomerHandler))
+	s.Router.Put("/api/customer/{id}", s.handler(h.UpdateCustomerHandler))
+	s.Router.Delete("/api/customer/{id}", s.handler(h.DeleteCustomerHandler))
 }
 
 func (s *Server) setupRouter() {
