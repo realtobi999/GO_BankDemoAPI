@@ -9,7 +9,7 @@ import (
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
-type HandlerFunc func(http.ResponseWriter, *http.Request, types.ILogger)
+type HandlerFunc func(http.ResponseWriter, *http.Request, types.ILogger, types.IStorage)
 
 
 func (s *Server) loadRoutes() {
@@ -24,6 +24,6 @@ func (s *Server) setupRouter() {
 func (s *Server) handler(handlerFunc HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.Logger.LogEvent(fmt.Sprintf("Request received: %s %s", r.Method, r.URL.Path))
-		handlerFunc(w, r, s.Logger)
+		handlerFunc(w, r, s.Logger, s.Storage)
 	}
 }
