@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-func ClearConsole() {
+func clearConsole() {
 	// Clearing the terminal screen based on the OS
 	switch runtime.GOOS {
 	case "linux", "darwin":
@@ -36,7 +36,7 @@ func ClearConsole() {
  *                                         __/ |                           
  *                                        |___/                            
  */
-func PrintASCII() {
+func printASCII() {
 	fmt.Println(``)
 	fmt.Println(` ______                _      _____              _                    `)
 	fmt.Println(` | ___ \              | |    /  ___|            | |                   `)

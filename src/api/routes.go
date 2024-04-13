@@ -10,13 +10,14 @@ import (
 
 type HandlerFunc func(http.ResponseWriter, *http.Request)
 
-func (s *Server) setupRouter() {
-	s.Router = chi.NewRouter()
-}
 
 func (s *Server) loadRoutes() {
 	s.Router.Get("/api/health", s.handler(h.HealthTestHandler))
 	s.Router.Get("/api/error", s.handler(h.ErrorTestHandler))
+}
+
+func (s *Server) setupRouter() {
+	s.Router = chi.NewRouter()
 }
 
 func (s *Server) handler(handlerFunc HandlerFunc) http.HandlerFunc {

@@ -2,16 +2,27 @@ package main
 
 import (
 	"log"
+	"os"
+	"strconv"
 
+	"github.com/joho/godotenv"
 	"github.com/realtobi999/GO_BankDemoApi/src/api"
-	u "github.com/realtobi999/GO_BankDemoApi/src/utils"
 )
-
-const port int = 8080;
-
 func main() {
-	u.ClearConsole()
-	u.PrintASCII()
+	clearConsole()
+	printASCII()
+
+	// Load the .env file containing Environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("[Error] - Error loading .env file")
+	}
+
+	// Get the server port
+	port, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
+	if err != nil {
+		log.Fatal("[Error] - Error parsing port from the .env file")
+	}
 
 	server := api.NewServer(port)
 
