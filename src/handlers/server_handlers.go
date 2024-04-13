@@ -12,5 +12,5 @@ func HealthTestHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, 
 }
 
 func ErrorTestHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
-	u.RespondWithError(w, l, 500, "Something went wrong! Oops...",)
+	u.RespondWithError(w, 500, "Something went wrong! Oops...",)
 }

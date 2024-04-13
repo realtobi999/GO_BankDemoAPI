@@ -9,4 +9,6 @@ type ILogger interface {
 
 type IStorage interface {
 	DatabaseHas(table, column string, value any) bool
+
+	CreateCustomer(Customer) (int64, error)
 }
