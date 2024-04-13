@@ -30,14 +30,20 @@ func main() {
 	// Initiate the logger
 	logger := logs.NewLogger(`src\utils\logs\logs.txt`)
 
-	//Initiate the database
-	storage, err := storage.NewPostgres("localhost", "5432", "postgres", "root", "GoBank", "disable")
+	// Initiate the database
+	database, err := storage.NewPostgres("localhost", "5432", "postgres", "root", "GoBank", "disable")
 	if err != nil {
 		logger.Fatal(err)
 	}
-	logger.LogEvent("Database is successfully connected")
+	logger.LogEvent("Database is successfully connected!")
 
-	server := api.NewServer(port, storage, logger)
+	// Run migrations
+	if err := storage.RunMigrations(database.DB, logger); err != nil {
+		logger.Fatal(err)
+	}
+	logger.LogEvent("Migration are successfully inserted!")
+
+	server := api.NewServer(port, database, logger)
 
 	logger.LogEvent(fmt.Sprintf("Server successfully started on port : %v", server.Port))
 	log.Fatal(server.Run())

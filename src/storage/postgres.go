@@ -8,7 +8,7 @@ import (
 )
 
 type Postgres struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
 func NewPostgres(host, port, user, password, dbname, sslmode string) (*Postgres, error) {
@@ -32,14 +32,14 @@ func NewPostgres(host, port, user, password, dbname, sslmode string) (*Postgres,
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	return &Postgres{db: db}, nil
+	return &Postgres{DB: db}, nil
 }
 
 func (p *Postgres) DatabaseHas(table, column string, value any) bool{
 	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s = $1 LIMIT 1", column, table, column)
 
 	var result sql.NullString
-	err := p.db.QueryRow(query, value).Scan(&result)
+	err := p.DB.QueryRow(query, value).Scan(&result)
 
 	return err == nil && result.Valid
 }
