@@ -24,38 +24,39 @@ func NewLogger(path string) *Logger {
 	}
 }
 
-func (l *Logger) LogEvent(message string) {
+func (l *Logger) LogEvent(message any) {
 	l.logToConsole("EVENT", message)
 	l.logToFile("EVENT", message)
 }
 
-func (l *Logger) LogDebug(message string) {
+func (l *Logger) LogDebug(message any) {
 	l.logToConsole("DEBUG", message)
 	l.logToFile("DEBUG", message)
 }
 
-func (l *Logger) LogError(message string) {
+func (l *Logger) LogError(message any) {
 	l.logToConsole("ERROR", message)
 	l.logToFile("ERROR", message)
 }
 
-func (l *Logger) LogWarning(message string) {
+func (l *Logger) LogWarning(message any) {
 	l.logToConsole("WARNING", message)
 	l.logToFile("WARNING", message)
 }
 
-func (l *Logger) logToConsole(bracketTxt, message string) {
+func (l *Logger) logToConsole(bracketTxt, message any) {
 	l.logger.Printf("[%s]:\t %s\n", bracketTxt, message)
 }
 
-func (l *Logger) logToFile(bracketTxt, message string) {
+func (l *Logger) logToFile(bracketTxt, message any) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 	fmt.Fprintf(l.file, "%v [%s]:\t %s\n", timestamp, bracketTxt, message)
 }
 
 func (l *Logger) Fatal(data ...interface{}) {
 	for _, d := range data {
-		l.logger.Print(d)
+		l.logToConsole("ERROR", d)
+		l.logToFile("ERROR", d)
 	}
 
 	os.Exit(1) // Exit with a non-zero status code to indicate an error.
