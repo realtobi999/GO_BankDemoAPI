@@ -12,12 +12,14 @@ type Server struct {
 	Port   int
 	Router *chi.Mux
 	Logger types.ILogger
+	Storage types.IStorage
 }
 
-func NewServer(port int, logger types.ILogger) Server {
+func NewServer(port int, storage types.IStorage,logger types.ILogger) Server {
 	return Server{
 		Port: port,
 		Logger:  logger,
+		Storage:  storage,
 	}
 }
 

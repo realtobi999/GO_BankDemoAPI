@@ -1,8 +1,8 @@
 package types
 
 type ILogger interface {
-	LogEvent(message string)
-	LogError(message string)
-	LogDebug(message string)
-	LogWarning(message string)
+	LogEvent(message any)
+	LogError(message any)
+	LogDebug(message any)
+	LogWarning(message any)
 }
