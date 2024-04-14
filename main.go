@@ -27,11 +27,20 @@ func main() {
 		log.Fatal("[Error] - Error parsing port from the .env file")
 	}
 
+	// Get database configuration
+	dbConfig := map[string]string{
+		"host":     os.Getenv("DB_HOST"),
+		"port":     os.Getenv("DB_PORT"),
+		"username": os.Getenv("DB_USERNAME"),
+		"password": os.Getenv("DB_PASSWORD"),
+		"dbName":   os.Getenv("DB_NAME"),
+	}
+
 	// Initiate the logger
 	logger := logs.NewLogger(`src\utils\logs\logs.txt`)
 
 	// Initiate the database
-	database, err := storage.NewPostgres("localhost", "5432", "postgres", "root", "GoBank", "disable")
+	database, err := storage.NewPostgres(dbConfig["host"], dbConfig["port"], dbConfig["username"], dbConfig["password"], dbConfig["dbName"], "disable")
 	if err != nil {
 		logger.Fatal(err)
 	}
