@@ -16,3 +16,5 @@ POST http://localhost:8080/api/customer
     "address": "123 Main St"
 }
 
+###
+GET http://localhost:8080/api/customer?limit=25

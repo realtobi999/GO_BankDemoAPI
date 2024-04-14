@@ -30,10 +30,29 @@ func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogg
 	}
 
 	w.Header().Set("Location", "/api/customers/"+customer.ID.String())
-	u.RespondWithJson(w, 201, customer.ToDTO())
+	u.RespondWithJson(w, http.StatusCreated, customer.ToDTO())
 }
 func IndexCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
+	// Parse limit and offset parameters
+	limit, offset, err := u.ParseLimitOffsetParams(r)
+	if err != nil {
+		u.RespondWithError(w, http.StatusBadRequest, "Failed to parse parameters: "+err.Error())
+		return
+	}
 
+	customers, err := s.GetAllCustomers(limit, offset)
+	if err != nil {
+		u.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch customers: "+err.Error())
+		return
+	}
+
+	// Serialize the customers for the response body
+	var customersDTO []types.CustomerDTO
+	for _, customer := range(customers) {
+		customersDTO = append(customersDTO, customer.ToDTO())
+	}
+
+	u.RespondWithJson(w, http.StatusOK, customersDTO)
 }
 func GetCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
 

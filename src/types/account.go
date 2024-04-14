@@ -3,12 +3,12 @@ package types
 import (
 	"time"
 
-	"github.com/beevik/guid"
+	"github.com/google/uuid"
 )
 
 type Account struct {
-	ID guid.Guid
-	CustomerID guid.Guid
+	ID uuid.UUID
+	CustomerID uuid.UUID
 	Balance float64
 	Type string
 	Currency string

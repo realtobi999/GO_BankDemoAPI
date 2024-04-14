@@ -10,5 +10,10 @@ type ILogger interface {
 type IStorage interface {
 	DatabaseHas(table, column string, value any) bool
 
+	GetAllCustomers(limit int, offset int) ([]Customer, error)
 	CreateCustomer(Customer) (int64, error)
+}
+
+type ISerializable interface {
+	ToDTO()
 }

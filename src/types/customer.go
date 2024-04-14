@@ -5,12 +5,12 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/beevik/guid"
+	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils"
 )
 
 type Customer struct {
-	ID        guid.Guid
+	ID        uuid.UUID
 	FirstName string
 	LastName  string
 	Birthday  time.Time
@@ -57,7 +57,7 @@ func (c *Customer) ToDTO() CustomerDTO {
 
 func (r CreateCustomerRequest) ToCustomer() Customer {
 	return Customer{
-		ID:        *guid.New(),
+		ID:        uuid.New(),
 		FirstName: r.FirstName,
 		LastName:  r.LastName,
 		Birthday:  r.Birthday,
