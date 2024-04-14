@@ -6,6 +6,7 @@ import (
 
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils"
+	"github.com/realtobi999/GO_BankDemoApi/src/utils/custom_errors"
 )
 
 func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
@@ -21,6 +22,7 @@ func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogg
 		return
 	}
 
+	// Convert the body and create types.Customer struct
 	customer := body.ToCustomer()
 
 	_, err := s.CreateCustomer(customer);
@@ -42,6 +44,10 @@ func IndexCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogge
 
 	customers, err := s.GetAllCustomers(limit, offset)
 	if err != nil {
+		if err.Error() == custom_errors.StorageNoResultsFound {
+			RespondWithError(w, http.StatusNotFound, "No customers found!")
+			return
+		}
 		RespondWithError(w, http.StatusInternalServerError, "Failed to fetch customers: "+err.Error())
 		return
 	}
