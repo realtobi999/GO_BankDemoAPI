@@ -15,5 +15,7 @@ type IStorage interface {
 }
 
 type ISerializable interface {
-	ToDTO()
+	ToDTO() DTO
 }
+
+type DTO interface{}

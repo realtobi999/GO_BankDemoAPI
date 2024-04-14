@@ -22,14 +22,14 @@ type Customer struct {
 }
 
 type CustomerDTO struct {
-    ID        string
-	FirstName string
-	LastName  string
-	Birthday  time.Time
-	Email     string
-	Phone     string
-	State     string
-	Address   string
+	ID        string    `json:"id"`
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Birthday  time.Time `json:"birthday"`
+	Email     string    `json:"email"`
+	Phone     string    `json:"phone"`
+	State     string    `json:"state"`
+	Address   string    `json:"address"`
 }
 
 type CreateCustomerRequest struct {
@@ -42,17 +42,17 @@ type CreateCustomerRequest struct {
 	Address   string    `json:"address"`
 }
 
-func (c *Customer) ToDTO() CustomerDTO {
-    return CustomerDTO{
-        ID: c.ID.String(),
-        FirstName: c.FirstName,
+func (c Customer) ToDTO() DTO {
+	return CustomerDTO{
+		ID:        c.ID.String(),
+		FirstName: c.FirstName,
 		LastName:  c.LastName,
 		Birthday:  c.Birthday,
 		Email:     c.Email,
 		Phone:     c.Phone,
 		State:     c.State,
 		Address:   c.Address,
-    }
+	}
 }
 
 func (r CreateCustomerRequest) ToCustomer() Customer {

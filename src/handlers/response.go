@@ -1,8 +1,10 @@
-package utils
+package handlers
 
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
 type SuccessResponse struct {
@@ -33,6 +35,20 @@ func RespondWithJson(w http.ResponseWriter, code int, payload any) error {
 	}
 
 	return json.NewEncoder(w).Encode(response)
+}
+
+func RespondWithJsonAndSerialize(w http.ResponseWriter, code int, payload types.ISerializable) error {
+	return RespondWithJson(w, code, payload.ToDTO())
+}
+
+func RespondWithJsonAndSerializeList(w http.ResponseWriter, code int, payload []types.ISerializable) error {
+	var serializedPayload []types.DTO
+
+	for _, value := range(payload) {
+		serializedPayload = append(serializedPayload, value.ToDTO())
+	}
+
+	return RespondWithJson(w, code, serializedPayload)
 }
 
 func RespondWithError(w http.ResponseWriter, code int, message string) error {

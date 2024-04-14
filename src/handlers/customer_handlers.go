@@ -5,19 +5,19 @@ import (
 	"net/http"
 
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
-	u "github.com/realtobi999/GO_BankDemoApi/src/utils"
+	"github.com/realtobi999/GO_BankDemoApi/src/utils"
 )
 
 func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
 	body := types.CreateCustomerRequest{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		u.RespondWithError(w, http.StatusBadRequest, "Failed to parse the request: "+err.Error())
+	    RespondWithError(w, http.StatusBadRequest, "Failed to parse the request: "+err.Error())
 		return
 	}
 
 	if err := body.Validate(); err != nil {
-		u.RespondWithValidationErrors(w, http.StatusBadRequest, "Failed to validate request", err)
+	    RespondWithValidationErrors(w, http.StatusBadRequest, "Failed to validate request", err)
 		return
 	}
 
@@ -25,34 +25,35 @@ func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogg
 
 	_, err := s.CreateCustomer(customer);
 	if err != nil {
-		u.RespondWithError(w, http.StatusInternalServerError, "Failed to create user: "+err.Error())
+	    RespondWithError(w, http.StatusInternalServerError, "Failed to create user: "+err.Error())
 		return
 	}
 
 	w.Header().Set("Location", "/api/customers/"+customer.ID.String())
-	u.RespondWithJson(w, http.StatusCreated, customer.ToDTO())
+    RespondWithJsonAndSerialize(w, http.StatusCreated, customer)
 }
 func IndexCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
 	// Parse limit and offset parameters
-	limit, offset, err := u.ParseLimitOffsetParams(r)
+	limit, offset, err := utils.ParseLimitOffsetParams(r)
 	if err != nil {
-		u.RespondWithError(w, http.StatusBadRequest, "Failed to parse parameters: "+err.Error())
+	    RespondWithError(w, http.StatusBadRequest, "Failed to parse parameters: "+err.Error())
 		return
 	}
 
 	customers, err := s.GetAllCustomers(limit, offset)
 	if err != nil {
-		u.RespondWithError(w, http.StatusInternalServerError, "Failed to fetch customers: "+err.Error())
+		RespondWithError(w, http.StatusInternalServerError, "Failed to fetch customers: "+err.Error())
 		return
 	}
 
-	// Serialize the customers for the response body
-	var customersDTO []types.CustomerDTO
-	for _, customer := range(customers) {
-		customersDTO = append(customersDTO, customer.ToDTO())
+	// We do this conversion because we cant
+	// safely pass the argument into the function
+	var serialized []types.ISerializable
+	for _, value := range(customers){
+		serialized = append(serialized, value)
 	}
+	RespondWithJsonAndSerializeList(w, http.StatusOK, serialized)
 
-	u.RespondWithJson(w, http.StatusOK, customersDTO)
 }
 func GetCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
 
