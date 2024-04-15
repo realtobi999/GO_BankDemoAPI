@@ -15,6 +15,7 @@ type IStorage interface {
 	GetCustomer(id uuid.UUID) (Customer, error)
 	GetAllCustomers(limit int, offset int) ([]Customer, error)
 	CreateCustomer(Customer) (int64, error)
+	UpdateCustomer(Customer) error
 }
 
 type ISerializable interface {

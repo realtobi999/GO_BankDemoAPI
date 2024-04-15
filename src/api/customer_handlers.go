@@ -15,15 +15,16 @@ func (s *Server) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.Decode[types.CreateCustomerRequest](r)
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
-	}
-
-	if err := body.Validate(); err != nil {
-		RespondWithValidationErrors(w, s.Logger, http.StatusBadRequest, "Failed to validate request", err)
 		return
 	}
 
 	// Convert the body and create types.Customer struct
 	customer := body.ToCustomer()
+
+	if err := customer.Validate(); err != nil {
+		RespondWithValidationErrors(w, s.Logger, http.StatusBadRequest, "Failed to validate request", err)
+		return
+	}
 
 	_, err = s.Storage.CreateCustomer(customer)
 	if err != nil {
@@ -53,7 +54,6 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	RespondWithJsonAndSerializeList(w, http.StatusOK, customers)
-
 }
 func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the UUID id
@@ -62,6 +62,7 @@ func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(idStr)
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+		return
 	}
 
 	customer, err := s.Storage.GetCustomer(id)
@@ -77,7 +78,35 @@ func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJsonAndSerialize(w, http.StatusOK, customer)
 }
 func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := utils.Decode[types.UpdateCustomerRequest](r)
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
+		return
+	}
 
+	// Convert the body and create types.Customer struct
+	customer := body.ToCustomer()
+
+	// Set the ID for the body
+	customer.ID, err = uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+		return
+	}
+	
+	// Validate
+	if err := customer.Validate(); err != nil {
+		RespondWithValidationErrors(w, s.Logger, http.StatusBadRequest, "Failed to validate request", err)
+		return
+	}
+
+	// Pass the customer pointer into the storage and update the database	
+	if err := s.Storage.UpdateCustomer(customer); err != nil {
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to update the field in the database: "+err.Error())
+		return
+	}
+
+	RespondWithJson(w, http.StatusOK, nil)
 }
 func (s *Server) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 

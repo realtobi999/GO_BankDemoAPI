@@ -42,6 +42,16 @@ type CreateCustomerRequest struct {
 	Address   string    `json:"address"`
 }
 
+type UpdateCustomerRequest struct {
+	FirstName string    `json:"first_name"`
+	LastName  string    `json:"last_name"`
+	Birthday  time.Time `json:"birthday"`
+	Email     string    `json:"email"`
+	Phone     string    `json:"phone"`
+	State     string    `json:"state"`
+	Address   string    `json:"address"`
+}
+
 func (c Customer) ToDTO() DTO {
 	return CustomerDTO{
 		ID:        c.ID.String(),
@@ -52,6 +62,19 @@ func (c Customer) ToDTO() DTO {
 		Phone:     c.Phone,
 		State:     c.State,
 		Address:   c.Address,
+	}
+}
+
+func (r UpdateCustomerRequest) ToCustomer() (Customer) {
+	return Customer{
+		FirstName: r.FirstName,
+		LastName:  r.LastName,
+		Birthday:  r.Birthday,
+		Email:     r.Email,
+		Phone:     r.Phone,
+		State:     r.State,
+		Address:   r.Address,
+		Accounts:  []Account{},
 	}
 }
 
@@ -69,8 +92,12 @@ func (r CreateCustomerRequest) ToCustomer() Customer {
 	}
 }
 
-func (r CreateCustomerRequest) Validate() []error {
+func (r Customer) Validate() []error {
 	var validationErrors []error
+
+	if r.ID == uuid.Nil {
+		validationErrors = append(validationErrors, errors.New("id is required"))
+	}
 
 	if r.FirstName == "" {
 		validationErrors = append(validationErrors, errors.New("first name is required"))

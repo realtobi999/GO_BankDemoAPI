@@ -2,6 +2,7 @@ package storage
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
@@ -67,4 +68,27 @@ func (p *Postgres) CreateCustomer(customer types.Customer) (int64, error) {
     }
 
     return rowsAffected, nil
+}
+
+func (p *Postgres) UpdateCustomer(customer types.Customer) error {
+    query := `
+    UPDATE customers
+    SET first_name = $1, last_name = $2, birthday = $3, email = $4, phone = $5, state = $6, address = $7
+    WHERE id = $8`
+
+    result, err := p.DB.Exec(query, customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address, customer.ID)
+    if err != nil {
+        return err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return err
+    }
+
+    if rowsAffected == 0 {
+        return errors.New("no rows affected")
+    }
+
+    return nil
 }
