@@ -1,4 +1,4 @@
-package handlers
+package api
 
 import (
 	"encoding/json"
@@ -41,7 +41,7 @@ func RespondWithJsonAndSerialize(w http.ResponseWriter, code int, payload types.
 	return RespondWithJson(w, code, payload.ToDTO())
 }
 
-func RespondWithJsonAndSerializeList(w http.ResponseWriter, code int, payload []types.ISerializable) error {
+func RespondWithJsonAndSerializeList[T types.ISerializable](w http.ResponseWriter, code int, payload []T) error {
 	var serializedPayload []types.DTO
 
 	for _, value := range(payload) {

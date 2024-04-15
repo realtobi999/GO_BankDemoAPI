@@ -1,7 +1,6 @@
-package handlers
+package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
@@ -9,12 +8,10 @@ import (
 	"github.com/realtobi999/GO_BankDemoApi/src/utils/custom_errors"
 )
 
-func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
-	body := types.CreateCustomerRequest{}
-
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-	    RespondWithError(w, http.StatusBadRequest, "Failed to parse the request: "+err.Error())
-		return
+func (s *Server) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := utils.Decode[types.CreateCustomerRequest](r)
+	if err != nil {
+		RespondWithError(w, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
 	}
 
 	if err := body.Validate(); err != nil {
@@ -25,7 +22,7 @@ func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogg
 	// Convert the body and create types.Customer struct
 	customer := body.ToCustomer()
 
-	_, err := s.CreateCustomer(customer);
+	_, err = s.Storage.CreateCustomer(customer);
 	if err != nil {
 	    RespondWithError(w, http.StatusInternalServerError, "Failed to create user: "+err.Error())
 		return
@@ -34,7 +31,7 @@ func CreateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogg
 	w.Header().Set("Location", "/api/customers/"+customer.ID.String())
     RespondWithJsonAndSerialize(w, http.StatusCreated, customer)
 }
-func IndexCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
+func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse limit and offset parameters
 	limit, offset, err := utils.ParseLimitOffsetParams(r)
 	if err != nil {
@@ -42,7 +39,7 @@ func IndexCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogge
 		return
 	}
 
-	customers, err := s.GetAllCustomers(limit, offset)
+	customers, err := s.Storage.GetAllCustomers(limit, offset)
 	if err != nil {
 		if err.Error() == custom_errors.StorageNoResultsFound {
 			RespondWithError(w, http.StatusNotFound, "No customers found!")
@@ -52,21 +49,15 @@ func IndexCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogge
 		return
 	}
 
-	// We do this conversion because we cant
-	// safely pass the argument into the function
-	var serialized []types.ISerializable
-	for _, value := range(customers){
-		serialized = append(serialized, value)
-	}
-	RespondWithJsonAndSerializeList(w, http.StatusOK, serialized)
+	RespondWithJsonAndSerializeList(w, http.StatusOK, customers)
 
 }
-func GetCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
+func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 }
-func UpdateCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
+func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 }
-func DeleteCustomerHandler(w http.ResponseWriter, r *http.Request, l types.ILogger, s types.IStorage) {
+func (s *Server) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 }
