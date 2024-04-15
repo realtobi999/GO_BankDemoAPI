@@ -1,5 +1,7 @@
 package types
 
+import "github.com/google/uuid"
+
 type ILogger interface {
 	LogEvent(message any)
 	LogError(message any)
@@ -10,6 +12,7 @@ type ILogger interface {
 type IStorage interface {
 	DatabaseHas(table, column string, value any) bool
 
+	GetCustomer(id uuid.UUID) (Customer, error)
 	GetAllCustomers(limit int, offset int) ([]Customer, error)
 	CreateCustomer(Customer) (int64, error)
 }

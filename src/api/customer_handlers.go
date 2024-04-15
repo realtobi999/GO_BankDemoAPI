@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils/custom_errors"
@@ -53,7 +55,24 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+	}
 
+	customer, err := s.Storage.GetCustomer(id)
+	if err != nil {
+		if err.Error() == custom_errors.StorageNoResultsFound {
+			RespondWithError(w, s.Logger, http.StatusNotFound, "No customer found!")
+			return
+		}
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to fetch customer: "+err.Error())
+		return
+	}
+
+	RespondWithJsonAndSerialize(w, http.StatusOK, customer)
 }
 func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 

@@ -3,10 +3,24 @@ package storage
 import (
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils/custom_errors"
 )
 
+
+func (p *Postgres) GetCustomer(id uuid.UUID) (types.Customer, error) {
+    query := `SELECT * FROM customers WHERE id = $1 LIMIT 1`
+
+    var customer types.Customer
+
+    err := p.DB.QueryRow(query, id).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address)
+    if err != nil {
+        return types.Customer{}, err
+    }
+
+    return customer, nil
+}
 
 func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, error) {
     query := `SELECT * FROM customers LIMIT $1 OFFSET $2`

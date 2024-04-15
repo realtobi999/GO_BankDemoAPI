@@ -12,9 +12,12 @@ POST http://localhost:8080/api/customer
     "birthday": "1990-01-01T00:00:00Z",
     "email": "john.doe@example.com",
     "phone": "+420605401050",
-    "state": "New York",
+    "state": "Vsetín",
     "address": "123 Main St"
 }
 
 ###
 GET http://localhost:8080/api/customer?limit=25
+
+###
+GET http://localhost:8080/api/customer/ad94c90e-4ed4-4d79-ad29-9bb580efa642
