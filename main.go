@@ -47,7 +47,7 @@ func main() {
 	logger.LogEvent("Database is successfully connected!")
 
 	// Run migrations
-	if err := storage.RunMigrations(database.DB, logger); err != nil {
+	if err := storage.RunMigrations(storage.PathToMigrations,database.DB, logger); err != nil {
 		logger.Fatal(err)
 	}
 	logger.LogEvent("Migration are successfully inserted!")

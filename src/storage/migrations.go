@@ -10,8 +10,10 @@ import (
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
-func RunMigrations(db *sql.DB, logger types.ILogger) error {
-	files, err := filepath.Glob("src/storage/migrations/*.sql")
+const PathToMigrations string = "src/storage/migrations/*.sql"
+
+func RunMigrations(path string, db *sql.DB, logger types.ILogger) error {
+	files, err := filepath.Glob(path)
 	if err != nil {
 		return err
 	}

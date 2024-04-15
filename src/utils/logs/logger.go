@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+const PathToLogs string = "src/utils/logs/logs.txt"
+const PathToTestLogs string = "src/utils/logs/logs_test.txt"
+
 type Logger struct {
 	logger *log.Logger
 	file   *os.File
@@ -61,4 +64,3 @@ func (l *Logger) Fatal(data ...interface{}) {
 
 	os.Exit(1) // Exit with a non-zero status code to indicate an error.
 }
-
