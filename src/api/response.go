@@ -20,9 +20,9 @@ type ErrorResponse struct {
 }
 
 type multipleErrorResponse struct {
-	Message string   `json:"message"`
-	Status  int      `json:"status"`
-	Errors  []string `json:"errors"`
+	ErrorMessage string   `json:"message"`
+	Code         int      `json:"status"`
+	Errors       []string `json:"errors"`
 }
 
 func RespondWithJson(w http.ResponseWriter, code int, payload any) error {
@@ -77,9 +77,9 @@ func RespondWithValidationErrors(w http.ResponseWriter, logger types.ILogger, co
 	}
 
 	response := multipleErrorResponse{
-		Message: message,
-		Status:  code,
-		Errors:  errorStrings,
+		ErrorMessage: message,
+		Code:         code,
+		Errors:       errorStrings,
 	}
 
 	logger.LogError(fmt.Sprintf("Code: %v Message: %s", code, message))
