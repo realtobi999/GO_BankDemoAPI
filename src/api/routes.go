@@ -12,7 +12,7 @@ func (s *Server) loadRoutes() {
         r.Get("/health", s.handler(s.HealthTestHandler))
         r.Get("/error", s.handler(s.ErrorTestHandler))
     
-        r.Route("/customer", func(r chi.Router){ // Use 'r' here instead of 's.Router'
+        r.Route("/customer", func(r chi.Router){
             r.Get("/", s.handler(s.IndexCustomerHandler)) // Params: limit, offset
             r.Get("/{id}", s.handler(s.GetCustomerHandler))
             r.Post("/", s.handler(s.CreateCustomerHandler)) // Body: types.CreateCustomerRequest 
@@ -29,6 +29,14 @@ func (s *Server) setupRouter() {
 func (s *Server) handler(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.Logger.LogEvent(fmt.Sprintf("Request received: %s %s", r.Method, r.URL.Path))
+		defer func() {
+			if err := recover(); err != nil {
+				// Log the error
+				s.Logger.LogError(fmt.Sprintf("Panic recovered: %v", err))
+				// Respond with a 500 Internal Server Error
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+		}()
 		handlerFunc(w, r)
 	}
 }

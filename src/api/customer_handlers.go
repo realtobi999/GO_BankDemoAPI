@@ -11,41 +11,41 @@ import (
 func (s *Server) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.Decode[types.CreateCustomerRequest](r)
 	if err != nil {
-		RespondWithError(w, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
 	}
 
 	if err := body.Validate(); err != nil {
-	    RespondWithValidationErrors(w, http.StatusBadRequest, "Failed to validate request", err)
+		RespondWithValidationErrors(w, s.Logger, http.StatusBadRequest, "Failed to validate request", err)
 		return
 	}
 
 	// Convert the body and create types.Customer struct
 	customer := body.ToCustomer()
 
-	_, err = s.Storage.CreateCustomer(customer);
+	_, err = s.Storage.CreateCustomer(customer)
 	if err != nil {
-	    RespondWithError(w, http.StatusInternalServerError, "Failed to create user: "+err.Error())
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to create user: "+err.Error())
 		return
 	}
 
 	w.Header().Set("Location", "/api/customers/"+customer.ID.String())
-    RespondWithJsonAndSerialize(w, http.StatusCreated, customer)
+	RespondWithJsonAndSerialize(w, http.StatusCreated, customer)
 }
 func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse limit and offset parameters
 	limit, offset, err := utils.ParseLimitOffsetParams(r)
 	if err != nil {
-	    RespondWithError(w, http.StatusBadRequest, "Failed to parse parameters: "+err.Error())
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse parameters: "+err.Error())
 		return
 	}
 
 	customers, err := s.Storage.GetAllCustomers(limit, offset)
 	if err != nil {
 		if err.Error() == custom_errors.StorageNoResultsFound {
-			RespondWithError(w, http.StatusNotFound, "No customers found!")
+			RespondWithError(w, s.Logger, http.StatusNotFound, "No customers found!")
 			return
 		}
-		RespondWithError(w, http.StatusInternalServerError, "Failed to fetch customers: "+err.Error())
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to fetch customers: "+err.Error())
 		return
 	}
 

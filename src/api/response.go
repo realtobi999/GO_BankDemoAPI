@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
@@ -19,8 +20,8 @@ type ErrorResponse struct {
 }
 
 type multipleErrorResponse struct {
-	Message string  `json:"message"`
-	Status  int     `json:"status"`
+	Message string   `json:"message"`
+	Status  int      `json:"status"`
 	Errors  []string `json:"errors"`
 }
 
@@ -44,14 +45,14 @@ func RespondWithJsonAndSerialize(w http.ResponseWriter, code int, payload types.
 func RespondWithJsonAndSerializeList[T types.ISerializable](w http.ResponseWriter, code int, payload []T) error {
 	var serializedPayload []types.DTO
 
-	for _, value := range(payload) {
+	for _, value := range payload {
 		serializedPayload = append(serializedPayload, value.ToDTO())
 	}
 
 	return RespondWithJson(w, code, serializedPayload)
 }
 
-func RespondWithError(w http.ResponseWriter, code int, message string) error {
+func RespondWithError(w http.ResponseWriter, logger types.ILogger, code int, message string) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 
@@ -60,10 +61,12 @@ func RespondWithError(w http.ResponseWriter, code int, message string) error {
 		ErrorMessage: message,
 	}
 
+	logger.LogError(fmt.Sprintf("Code: %v Message: %s", code, message))
+
 	return json.NewEncoder(w).Encode(response)
 }
 
-func RespondWithValidationErrors(w http.ResponseWriter, code int, message string, errs []error) error {
+func RespondWithValidationErrors(w http.ResponseWriter, logger types.ILogger, code int, message string, errs []error) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 
@@ -78,6 +81,8 @@ func RespondWithValidationErrors(w http.ResponseWriter, code int, message string
 		Status:  code,
 		Errors:  errorStrings,
 	}
+
+	logger.LogError(fmt.Sprintf("Code: %v Message: %s", code, message))
 
 	return json.NewEncoder(w).Encode(response)
 }
