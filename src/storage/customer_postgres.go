@@ -1,11 +1,10 @@
 package storage
 
 import (
-	"errors"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
-	"github.com/realtobi999/GO_BankDemoApi/src/utils/custom_errors"
 )
 
 
@@ -48,7 +47,7 @@ func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, err
     }
 
     if len(customers) == 0 {
-        return nil, errors.New(custom_errors.StorageNoResultsFound)
+        return nil, sql.ErrNoRows
     }
 
     return customers, nil

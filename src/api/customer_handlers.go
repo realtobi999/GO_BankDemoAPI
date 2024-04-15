@@ -1,16 +1,17 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils"
-	"github.com/realtobi999/GO_BankDemoApi/src/utils/custom_errors"
 )
 
 func (s *Server) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	// Decode the body into the given struct
 	body, err := utils.Decode[types.CreateCustomerRequest](r)
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
@@ -43,7 +44,7 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 	customers, err := s.Storage.GetAllCustomers(limit, offset)
 	if err != nil {
-		if err.Error() == custom_errors.StorageNoResultsFound {
+		if err == sql.ErrNoRows{
 			RespondWithError(w, s.Logger, http.StatusNotFound, "No customers found!")
 			return
 		}
@@ -55,6 +56,7 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the UUID id
 	idStr := chi.URLParam(r, "id")
 	
 	id, err := uuid.Parse(idStr)
@@ -64,7 +66,7 @@ func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 	customer, err := s.Storage.GetCustomer(id)
 	if err != nil {
-		if err.Error() == custom_errors.StorageNoResultsFound {
+		if err == sql.ErrNoRows {
 			RespondWithError(w, s.Logger, http.StatusNotFound, "No customer found!")
 			return
 		}
