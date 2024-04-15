@@ -92,3 +92,23 @@ func (p *Postgres) UpdateCustomer(customer types.Customer) error {
 
     return nil
 }
+
+func (p *Postgres) DeleteCustomer(id uuid.UUID) (int64, error) {
+    query := `DELETE FROM customers WHERE id = $1`
+
+    result, err := p.DB.Exec(query, id)
+    if err != nil {
+        return 0, err
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return 0, err
+    }
+
+    if rowsAffected == 0 {
+        return rowsAffected, errors.New("no rows affected")
+    }
+
+    return rowsAffected, nil
+}

@@ -57,9 +57,7 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the UUID id
-	idStr := chi.URLParam(r, "id")
-	
-	id, err := uuid.Parse(idStr)
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
@@ -109,5 +107,23 @@ func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJson(w, http.StatusOK, nil)
 }
 func (s *Server) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse the UUID id
+	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+		return
+	}
 
+	// Delete the field from the database
+	_, err = s.Storage.DeleteCustomer(id)
+	if err != nil {
+		if err.Error() == "no rows affected" {
+			RespondWithError(w, s.Logger, http.StatusNotFound, "Customer with that ID doesnt exits!")
+			return
+		}
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to delete customer: "+err.Error())
+		return
+	}
+
+	RespondWithJson(w, http.StatusOK, nil)
 }

@@ -34,3 +34,6 @@ PUT http://localhost:8080/api/customer/48d5716a-c7b4-4551-bfb8-c78c40dab36c
     "state": "Vsetín",
     "address": "123 Main St"
 }
+
+###
+DELETE http://localhost:8080/api/customer/23508041-e7f6-421f-9267-7e2c3762f2aa
