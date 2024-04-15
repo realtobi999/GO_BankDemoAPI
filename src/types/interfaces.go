@@ -11,6 +11,7 @@ type ILogger interface {
 
 type IStorage interface {
 	DatabaseHas(table, column string, value any) bool
+	ClearAllTables() error
 
 	GetCustomer(id uuid.UUID) (Customer, error)
 	GetAllCustomers(limit int, offset int) ([]Customer, error)

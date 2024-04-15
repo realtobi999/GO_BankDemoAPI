@@ -44,3 +44,37 @@ func (p *Postgres) DatabaseHas(table, column string, value any) bool{
 	return err == nil && result.Valid
 }
 
+func (p *Postgres) ClearAllTables() error {
+	// Query to retrieve table names from information_schema.tables
+	query := `
+		SELECT table_name 
+		FROM information_schema.tables 
+		WHERE table_schema = 'public' AND table_type = 'BASE TABLE';
+	`
+
+	// Execute the query to retrieve table names
+	rows, err := p.DB.Query(query)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve table names: %v", err)
+	}
+	defer rows.Close()
+
+	// Truncate each table
+	for rows.Next() {
+		var tableName string
+		err := rows.Scan(&tableName)
+		if err != nil {
+			return fmt.Errorf("failed to scan table name: %v", err)
+		}
+
+		// Truncate the table
+		truncateQuery := fmt.Sprintf("TRUNCATE TABLE %s RESTART IDENTITY CASCADE", tableName)
+		_, err = p.DB.Exec(truncateQuery)
+		if err != nil {
+			return fmt.Errorf("failed to truncate table %s: %v", tableName, err)
+		}
+	}
+
+	return nil
+}
+

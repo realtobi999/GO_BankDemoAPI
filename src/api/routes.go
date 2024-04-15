@@ -29,14 +29,20 @@ func (s *Server) setupRouter() {
 func (s *Server) handler(handlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.Logger.LogEvent(fmt.Sprintf("Request received: %s %s", r.Method, r.URL.Path))
-		// defer func() {
-		// 	if err := recover(); err != nil {
-		// 		// Log the error
-		// 		s.Logger.LogError(fmt.Sprintf("Panic recovered: %v", err))
-		// 		// Respond with a 500 Internal Server Error
-		// 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		// 	}
-		// }()
+		defer func() {
+			if err := recover(); err != nil {
+				// Log the error
+				s.Logger.LogError(fmt.Sprintf("Panic recovered: %v", err))
+				// Respond with a 500 Internal Server Error
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+		}()
+		handlerFunc(w, r)
+	}
+}
+
+func (s *Server) TestHandler(handlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		handlerFunc(w, r)
 	}
 }
