@@ -14,7 +14,7 @@ func (p *Postgres) GetCustomer(id uuid.UUID) (types.Customer, error) {
 
     var customer types.Customer
 
-    err := p.DB.QueryRow(query, id).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address)
+    err := p.DB.QueryRow(query, id).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address, &customer.CreatedAt)
     if err != nil {
         return types.Customer{}, err
     }
@@ -23,7 +23,7 @@ func (p *Postgres) GetCustomer(id uuid.UUID) (types.Customer, error) {
 }
 
 func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, error) {
-    query := `SELECT * FROM customers LIMIT $1 OFFSET $2`
+    query := `SELECT * FROM customers ORDER BY created_at LIMIT $1 OFFSET $2`
 
     rows, err := p.DB.Query(query, limit, offset)
     if err != nil {
@@ -36,7 +36,7 @@ func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, err
     for rows.Next() {
         var customer types.Customer
 
-        if err := rows.Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address); err != nil {
+        if err := rows.Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address, &customer.CreatedAt); err != nil {
             return nil, err
         }
 
@@ -55,9 +55,9 @@ func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, err
 }
 
 func (p *Postgres) CreateCustomer(customer types.Customer) (int64, error) {
-    query := `INSERT INTO customers (id, first_name, last_name, birthday, email, phone, state, address) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+    query := `INSERT INTO customers (id, first_name, last_name, birthday, email, phone, state, address, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 
-    result, err := p.DB.Exec(query, customer.ID.String(), customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address)
+    result, err := p.DB.Exec(query, customer.ID.String(), customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address, customer.CreatedAt)
     if err != nil {
         return 0, err
     }

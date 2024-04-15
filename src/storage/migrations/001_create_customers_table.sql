@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS customers (
 		email VARCHAR(255),
 		phone VARCHAR(100),
 		state VARCHAR(255),
-		address TEXT
+		address TEXT,
+		created_at TIMESTAMP WITH TIME ZONE
 );

@@ -18,6 +18,7 @@ type Customer struct {
 	Phone     string
 	State     string
 	Address   string
+	CreatedAt time.Time
 	Accounts  []Account
 }
 
@@ -30,6 +31,7 @@ type CustomerDTO struct {
 	Phone     string    `json:"phone"`
 	State     string    `json:"state"`
 	Address   string    `json:"address"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type CreateCustomerRequest struct {
@@ -62,6 +64,7 @@ func (c Customer) ToDTO() DTO {
 		Phone:     c.Phone,
 		State:     c.State,
 		Address:   c.Address,
+		CreatedAt: c.CreatedAt,
 	}
 }
 
@@ -89,6 +92,7 @@ func (r CreateCustomerRequest) ToCustomer() Customer {
 		State:     r.State,
 		Address:   r.Address,
 		Accounts:  []Account{},
+		CreatedAt: time.Now(),
 	}
 }
 
