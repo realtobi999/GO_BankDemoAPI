@@ -51,6 +51,21 @@ func NewTestCustomer() types.Customer {
 	}
 }
 
+func NewTestAccount(customerID uuid.UUID) types.Account {
+	return types.Account{
+		ID:                  uuid.New(),
+		CustomerID:          customerID,
+		Balance:             0.0,
+		Type:                1,
+		Currency:            "USD",
+		Status:              true,
+		OpeningDate:         time.Now(),
+		LastTransactionDate: time.Now(),
+		InterestRate:        0.0,
+	}
+}
+
+
 func assertEqual(t *testing.T, expected, actual interface{}) {
 	t.Helper()
 	if !reflect.DeepEqual(expected, actual) {

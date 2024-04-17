@@ -18,6 +18,8 @@ type IStorage interface {
 	CreateCustomer(Customer) (int64, error)
 	UpdateCustomer(Customer) error
 	DeleteCustomer(id uuid.UUID) (int64, error)
+
+	CreateAccount(Account) (int64, error)
 }
 
 type ISerializable interface {

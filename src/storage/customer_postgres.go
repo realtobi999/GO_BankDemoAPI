@@ -55,7 +55,10 @@ func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, err
 }
 
 func (p *Postgres) CreateCustomer(customer types.Customer) (int64, error) {
-    query := `INSERT INTO customers (id, first_name, last_name, birthday, email, phone, state, address, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+    query := `
+    INSERT INTO customers 
+    (id, first_name, last_name, birthday, email, phone, state, address, created_at) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 
     result, err := p.DB.Exec(query, customer.ID.String(), customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address, customer.CreatedAt)
     if err != nil {

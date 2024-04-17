@@ -39,16 +39,21 @@ type AccountDTO struct {
 }
 
 type CreateAccountRequest struct {
-	CustomerID uuid.UUID
+	CustomerID string
 	Balance float64
 	Type AccountType
 	Currency string
 }
 
-func (r CreateAccountRequest) ToAccount() Account {
+func (r CreateAccountRequest) ToAccount() (Account, error) {
+	customerID, err := uuid.Parse(r.CustomerID)
+	if err != nil {
+		return Account{}, err
+	} 
+
 	return Account{
 		ID: uuid.New(),
-		CustomerID: r.CustomerID,
+		CustomerID: customerID,
 		Balance: r.Balance,
 		Type: r.Type,
 		Currency: r.Currency,
@@ -56,7 +61,7 @@ func (r CreateAccountRequest) ToAccount() Account {
 		OpeningDate: time.Now(),
 		LastTransactionDate: time.Now(),
 		InterestRate: 1.00,
-	}
+	}, nil
 }
 
 func (a Account) ToDTO() DTO {
