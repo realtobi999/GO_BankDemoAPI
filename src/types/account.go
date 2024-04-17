@@ -7,11 +7,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type AccountType int
+
+var AccountTypes = map[AccountType]string{
+	1: "Business",
+	2: "Personal",
+}
+
 type Account struct {
 	ID uuid.UUID
 	CustomerID uuid.UUID
 	Balance float64
-	Type string
+	Type AccountType
 	Currency string
 	Status bool
 	OpeningDate time.Time
@@ -23,12 +30,33 @@ type AccountDTO struct {
 	ID uuid.UUID
 	CustomerID uuid.UUID
 	Balance float64
-	Type string
+	Type AccountType
 	Currency string
 	Status bool
 	OpeningDate time.Time
 	LastTransactionDate time.Time
 	InterestRate float64
+}
+
+type CreateAccountRequest struct {
+	CustomerID uuid.UUID
+	Balance float64
+	Type AccountType
+	Currency string
+}
+
+func (r CreateAccountRequest) ToAccount() Account {
+	return Account{
+		ID: uuid.New(),
+		CustomerID: r.CustomerID,
+		Balance: r.Balance,
+		Type: r.Type,
+		Currency: r.Currency,
+		Status: true,
+		OpeningDate: time.Now(),
+		LastTransactionDate: time.Now(),
+		InterestRate: 1.00,
+	}
 }
 
 func (a Account) ToDTO() DTO {
@@ -60,8 +88,8 @@ func (a Account) Validate() []error {
         validationErrors = append(validationErrors, errors.New("Balance cannot be negative"))
     }
 
-    if a.Type == "" {
-        validationErrors = append(validationErrors, errors.New("Type cannot be empty"))
+    if _, ok := AccountTypes[a.Type]; !ok {
+        validationErrors = append(validationErrors, errors.New("Invalid account type"))
     }
 
     if a.Currency == "" {
@@ -82,3 +110,4 @@ func (a Account) Validate() []error {
 
     return validationErrors
 }
+
