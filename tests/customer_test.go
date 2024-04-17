@@ -262,8 +262,8 @@ func Test_Customer_Create_ValidationWorks(t *testing.T) {
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
 
 	rBody := struct {
-		Message string  `json:"message"`
-		Code    int     `json:"status"`
+		Message string   `json:"message"`
+		Code    int      `json:"status"`
 		Errors  []string `json:"errors"`
 	}{}
 	if err := json.NewDecoder(recorder.Body).Decode(&rBody); err != nil {
@@ -272,4 +272,122 @@ func Test_Customer_Create_ValidationWorks(t *testing.T) {
 
 	assertEqual(t, "first name is required", rBody.Errors[0])
 	assertEqual(t, "state is required", rBody.Errors[1])
+}
+
+func Test_Customer_Update_Works(t *testing.T) {
+	customer1 := NewTestCustomer()
+
+	server := NewTestServer()
+
+	server.Storage.ClearAllTables()
+	
+	server.Storage.CreateCustomer(customer1)
+
+	newFirstName := "Tobiáš"
+	newLastName := "Filgas"
+	newState := "Vsetín"
+
+	body := fmt.Sprintf(`
+	{
+		"first_name": "%s",
+		"last_name": "%s",
+		"birthday": "1990-01-01T00:00:00Z",
+		"email": "john.doe@example.com",
+		"phone": "+420605401050",
+		"state": "%s",
+		"address": "123 Main St"
+	}
+	`, newFirstName, newLastName, newState)
+
+	url := fmt.Sprintf("/api/customer/%s", customer1.ID.String())
+
+	req, err := http.NewRequest("PUT", url, strings.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Put("/api/customer/{id}", server.TestHandler(server.UpdateCustomerHandler))
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	updatedCustomer, err := server.Storage.GetCustomer(customer1.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, newFirstName, updatedCustomer.FirstName)
+	assertEqual(t, newLastName, updatedCustomer.LastName)
+	assertEqual(t, newState, updatedCustomer.State)
+}
+
+func Test_Customer_Update_ValidationWorks(t *testing.T) {
+	customer := NewTestCustomer()
+	server := NewTestServer()
+
+	server.Storage.ClearAllTables()
+
+	server.Storage.CreateCustomer(customer)
+
+	// missing fist_name and state
+	body := fmt.Sprintf(`
+	{
+		"last_name": "%s",
+		"birthday": "1990-01-01T00:00:00Z",
+		"email": "%s",
+		"phone": "%s",
+		"address": "%s"
+	}
+	`, customer.LastName, customer.Email, customer.Phone, customer.Address)
+
+	url := fmt.Sprintf("/api/customer/%s", customer.ID.String())
+
+	req, err := http.NewRequest("PUT", url, strings.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Put("/api/customer/{id}", server.TestHandler(server.UpdateCustomerHandler))
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusBadRequest, recorder.Code)
+
+	rBody := struct {
+		Message string   `json:"message"`
+		Code    int      `json:"status"`
+		Errors  []string `json:"errors"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&rBody); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, "first name is required", rBody.Errors[0])
+	assertEqual(t, "state is required", rBody.Errors[1])
+}
+
+func Test_Customer_Delete_Works(t *testing.T) {
+	customer := NewTestCustomer()
+	server := NewTestServer()
+
+	server.Storage.ClearAllTables()
+	server.Storage.CreateCustomer(customer)
+		
+	url := fmt.Sprintf("/api/customer/%s", customer.ID.String())
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Delete("/api/customer/{id}", server.TestHandler(server.DeleteCustomerHandler))
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+	assertDatabaseMissing(t, "customers", "id", customer.ID, server.Storage);
 }
