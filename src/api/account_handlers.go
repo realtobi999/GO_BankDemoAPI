@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils"
 )
@@ -14,9 +15,8 @@ func (s *Server) CreateAccountHandler(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
 		return
 	}
-
 	
-	account, err := body.ToAccount();
+	account, err := body.ToAccount(chi.URLParam(r, "customer_id"));
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
 		return

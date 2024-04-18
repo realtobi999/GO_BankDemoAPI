@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 )
 
@@ -24,21 +25,23 @@ func Test_Account_Create_Works(t *testing.T) {
 
 	body := fmt.Sprintf(`
 	{
-		"CustomerID": "%s",
 		"Balance": 1000.00,
 		"Type": 1,
 		"Currency": "USD"
 	  }	  
-	`, customer.ID.String())
+	`)
 
-	req, err := http.NewRequest("POST", "/api/account", strings.NewReader(body))
+	url := fmt.Sprintf("/api/customer/%s/account", customer.ID.String())
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}
 	recorder := httptest.NewRecorder()
 
-	handler := server.TestHandler(server.CreateAccountHandler)
-	handler.ServeHTTP(recorder, req)
+	router := chi.NewMux()
+	router.Post("/api/customer/{customer_id}/account", server.TestHandler(server.CreateAccountHandler))
+	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusCreated, recorder.Code)
 
@@ -57,23 +60,25 @@ func Test_Account_Create_Works(t *testing.T) {
 
 func Test_Account_Create_ValidationWorks(t *testing.T) {
 	server := NewTestServer()
+	customer := NewTestCustomer()
 
 	body := `{
-		"CustomerID": "7f407b99-75d3-4253-b09f-98564538e337",
 		"Balance": -1000.00,
 		"Type": 134,
 		"Currency": "USD"
 	}`
 	
+	url := fmt.Sprintf("/api/customer/%s/account", customer.ID.String())
 
-	req, err := http.NewRequest("POST", "/api/account", strings.NewReader(body))
+	req, err := http.NewRequest("POST", url, strings.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}
 	recorder := httptest.NewRecorder()
 
-	handler := server.TestHandler(server.CreateAccountHandler)
-	handler.ServeHTTP(recorder, req)
+	router := chi.NewMux()
+	router.Post("/api/customer/{customer_id}/account", server.TestHandler(server.CreateAccountHandler))
+	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
 
@@ -85,6 +90,7 @@ func Test_Account_Create_ValidationWorks(t *testing.T) {
 	if err := json.NewDecoder(recorder.Body).Decode(&rBody); err != nil {
 		t.Fatal(err)
 	}
+
 
 	assertEqual(t, true, slices.Contains(rBody.Errors, "Balance cannot be negative"))
 	assertEqual(t, true, slices.Contains(rBody.Errors, "Invalid account type"))

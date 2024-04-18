@@ -16,17 +16,18 @@ func (s *Server) loadRoutes() {
             r.Get("/", s.handler(s.IndexCustomerHandler)) // Params: limit, offset
             r.Get("/{id}", s.handler(s.GetCustomerHandler))
             r.Post("/", s.handler(s.CreateCustomerHandler)) // Body: types.CreateCustomerRequest 
-            r.Put("/{id}", s.handler(s.UpdateCustomerHandler))
+            r.Put("/{id}", s.handler(s.UpdateCustomerHandler)) // Body: types.UpdateCustomerRequest
             r.Delete("/{id}", s.handler(s.DeleteCustomerHandler))
+
+			r.Route("/{customer_id}/account", func(r chi.Router) {
+				r.Get("/", s.handler(s.IndexAccountHandler))
+				r.Get("/{id}", s.handler(s.GetAccountHandler))
+				r.Post("/", s.handler(s.CreateAccountHandler)) // Body: types.CreateAccountRequest
+				r.Put("/{id}", s.handler(s.UpdateAccountHandler))
+				r.Delete("/{id}", s.handler(s.DeleteAccountHandler))
+			})
         })
 
-		r.Route("/account", func(r chi.Router) {
-			r.Get("/", s.handler(s.IndexAccountHandler))
-			r.Get("/{id}", s.handler(s.GetAccountHandler))
-			r.Post("/", s.handler(s.CreateAccountHandler))
-			r.Put("/{id}", s.handler(s.UpdateAccountHandler))
-			r.Delete("/{id}", s.handler(s.DeleteAccountHandler))
-		})
     })
 }
 
