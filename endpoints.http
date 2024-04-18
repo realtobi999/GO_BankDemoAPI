@@ -39,7 +39,7 @@ PUT http://localhost:8080/api/customer/48d5716a-c7b4-4551-bfb8-c78c40dab36c
 DELETE http://localhost:8080/api/customer/23508041-e7f6-421f-9267-7e2c3762f2aa
 
 ###
-POST http://localhost:8080/api/customer/374b3ce3-6258-4667-b03a-5a7717fda85e/account
+POST http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/account
 
 {
   "Balance": 1000.00,
@@ -48,4 +48,7 @@ POST http://localhost:8080/api/customer/374b3ce3-6258-4667-b03a-5a7717fda85e/acc
 }
 
 ###
-GET http://localhost:8080/api/customer/374b3ce3-6258-4667-b03a-5a7717fda85e/account
+GET http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/account
+
+###
+GET http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/account/c5014bc0-8a71-412b-af89-1cffc13926bd

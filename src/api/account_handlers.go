@@ -67,7 +67,29 @@ func (s *Server) IndexAccountHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJsonAndSerializeList(w, 200, accounts)
 }
 func (s *Server) GetAccountHandler(w http.ResponseWriter, r *http.Request) {
-	
+	accountID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
+
+	customerID, err := uuid.Parse(chi.URLParam(r, "customer_id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
+
+	account, err := s.Storage.GetAccount(accountID, customerID)
+	if err != nil {
+		if err == sql.ErrNoRows{
+			RespondWithError(w, s.Logger, http.StatusNotFound, "No account found!")
+			return
+		}
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to fetch accounts: "+err.Error())
+		return
+	}
+
+	RespondWithJsonAndSerialize(w, http.StatusOK, account)
 }
 func (s *Server) UpdateAccountHandler(w http.ResponseWriter, r *http.Request) {
 

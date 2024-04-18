@@ -20,6 +20,7 @@ type IStorage interface {
 	DeleteCustomer(id uuid.UUID) (int64, error)
 
 	GetAllAccountsFrom(customerID uuid.UUID, limit int, offset int) ([]Account, error)
+	GetAccount(accountID uuid.UUID, customerID uuid.UUID) (Account, error)
 	CreateAccount(account Account) (int64, error)
 }
 

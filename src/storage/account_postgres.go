@@ -39,6 +39,20 @@ func (p *Postgres) GetAllAccountsFrom(customerID uuid.UUID, limit int, offset in
     return accounts, nil
 
 }
+
+func (p *Postgres) GetAccount(accountID uuid.UUID, customerID uuid.UUID) (types.Account, error) {
+	query := `SELECT * FROM accounts WHERE id = $1 AND customer_id = $2 LIMIT 1`
+
+	var account types.Account
+
+	err := p.DB.QueryRow(query, accountID, customerID).Scan(&account.ID ,&account.CustomerID ,&account.Balance, &account.Type, &account.Currency, &account.Status, &account.OpeningDate, &account.LastTransactionDate, &account.InterestRate, &account.CreatedAt)
+	if err != nil {
+		return types.Account{}, err
+	}
+
+	return account, nil
+}
+
 func (p *Postgres) CreateAccount(account types.Account) (int64, error) {
 	query := `
 	INSERT INTO accounts
