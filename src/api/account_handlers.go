@@ -1,9 +1,11 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils"
 )
@@ -39,7 +41,30 @@ func (s *Server) CreateAccountHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJsonAndSerialize(w, http.StatusCreated, account)
 }
 func (s *Server) IndexAccountHandler(w http.ResponseWriter, r *http.Request) {
-	
+	// Parse limit and offset parameters
+	limit, offset, err := utils.ParseLimitOffsetParams(r)
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse parameters: "+err.Error())
+		return
+	}
+
+	customerID, err := uuid.Parse(chi.URLParam(r, "customer_id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
+
+	accounts, err := s.Storage.GetAllAccountsFrom(customerID, limit, offset)
+	if err != nil {
+		if err == sql.ErrNoRows{
+			RespondWithError(w, s.Logger, http.StatusNotFound, "No accounts found!")
+			return
+		}
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to fetch accounts: "+err.Error())
+		return
+	}
+
+	RespondWithJsonAndSerializeList(w, 200, accounts)
 }
 func (s *Server) GetAccountHandler(w http.ResponseWriter, r *http.Request) {
 	

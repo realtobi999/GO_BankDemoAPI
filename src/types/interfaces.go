@@ -15,11 +15,12 @@ type IStorage interface {
 
 	GetCustomer(id uuid.UUID) (Customer, error)
 	GetAllCustomers(limit int, offset int) ([]Customer, error)
-	CreateCustomer(Customer) (int64, error)
-	UpdateCustomer(Customer) error
+	CreateCustomer(customer Customer) (int64, error)
+	UpdateCustomer(customer Customer) error
 	DeleteCustomer(id uuid.UUID) (int64, error)
 
-	CreateAccount(Account) (int64, error)
+	GetAllAccountsFrom(customerID uuid.UUID, limit int, offset int) ([]Account, error)
+	CreateAccount(account Account) (int64, error)
 }
 
 type ISerializable interface {

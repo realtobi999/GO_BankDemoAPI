@@ -94,4 +94,44 @@ func Test_Account_Create_ValidationWorks(t *testing.T) {
 
 	assertEqual(t, true, slices.Contains(rBody.Errors, "Balance cannot be negative"))
 	assertEqual(t, true, slices.Contains(rBody.Errors, "Invalid account type"))
-}	
+}
+
+func Test_Account_GetAll_Works(t *testing.T) {
+	customer := NewTestCustomer()
+
+	account1 := NewTestAccount(customer.ID)
+	account2 := NewTestAccount(customer.ID)
+
+	server := NewTestServer()
+	server.Storage.ClearAllTables()
+
+	server.Storage.CreateCustomer(customer)
+	server.Storage.CreateAccount(account1)
+	server.Storage.CreateAccount(account2)
+
+	url := fmt.Sprintf("/api/customer/%s/account", customer.ID.String())
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Get("/api/customer/{customer_id}/account", server.TestHandler(server.IndexAccountHandler))
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	body := struct {
+		Message string              `json:"message"`
+		Status  int                 `json:"status"`
+		Data    []types.AccountDTO    `json:"data"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, account1.ID.String(), body.Data[0].ID.String())
+	assertEqual(t, account2.ID.String(), body.Data[1].ID.String())
+}
