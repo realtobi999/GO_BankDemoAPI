@@ -24,6 +24,7 @@ type Account struct {
 	OpeningDate time.Time
 	LastTransactionDate time.Time
 	InterestRate float64
+	CreatedAt time.Time
 }
 
 type AccountDTO struct {
@@ -36,6 +37,7 @@ type AccountDTO struct {
 	OpeningDate time.Time
 	LastTransactionDate time.Time
 	InterestRate float64
+	CreatedAt time.Time
 }
 
 type CreateAccountRequest struct {
@@ -60,6 +62,7 @@ func (r CreateAccountRequest) ToAccount(customerID string) (Account, error) {
 		OpeningDate:         time.Now(),
 		LastTransactionDate: time.Now(),
 		InterestRate:        1.00,
+		CreatedAt:  		 time.Now(),		
 	}, nil
 }
 
@@ -74,6 +77,7 @@ func (a Account) ToDTO() DTO {
 		OpeningDate: a.OpeningDate,
 		LastTransactionDate: a.LastTransactionDate,
 		InterestRate: a.InterestRate,
+		CreatedAt: a.CreatedAt,
 	}
 }
 

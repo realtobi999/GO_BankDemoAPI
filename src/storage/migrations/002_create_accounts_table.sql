@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS accounts (
     status BOOLEAN,
     opening_date TIMESTAMP WITH TIME ZONE,
     last_transaction_date TIMESTAMP WITH TIME ZONE,
-    interest_rate FLOAT
+    interest_rate FLOAT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
