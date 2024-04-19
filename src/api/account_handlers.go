@@ -92,7 +92,39 @@ func (s *Server) GetAccountHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJsonAndSerialize(w, http.StatusOK, account)
 }
 func (s *Server) UpdateAccountHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := utils.Decode[types.UpdateAccountRequest](r)
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the body: "+err.Error())
+		return
+	}
 
+	accountID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
+
+	customerID, err := uuid.Parse(chi.URLParam(r, "customer_id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
+
+	
+	account := body.ToAccount(accountID, customerID)
+
+	// Validate
+	if err := account.Validate(); err != nil {
+		RespondWithValidationErrors(w, s.Logger, http.StatusBadRequest, "Failed to validate request", err)
+		return
+	}
+
+	if err := s.Storage.UpdateAccount(account); err != nil {
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to update the field in the database: "+err.Error())
+		return
+	}
+
+	RespondWithJson(w, http.StatusOK, nil)
 }
 func (s *Server) DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
 

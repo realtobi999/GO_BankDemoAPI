@@ -39,7 +39,7 @@ PUT http://localhost:8080/api/customer/48d5716a-c7b4-4551-bfb8-c78c40dab36c
 DELETE http://localhost:8080/api/customer/23508041-e7f6-421f-9267-7e2c3762f2aa
 
 ###
-POST http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/account
+POST http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account
 
 {
   "Balance": 1000.00,
@@ -48,7 +48,19 @@ POST http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/acc
 }
 
 ###
-GET http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/account
+GET http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account
 
 ###
-GET http://localhost:8080/api/customer/03c63b6e-a4eb-4122-a859-23f871e5a8c1/account/c5014bc0-8a71-412b-af89-1cffc13926bd
+GET http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account/99fd0672-6d4b-46d2-9641-ab21a8ebd52c
+
+###
+PUT http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account/99fd0672-6d4b-46d2-9641-ab21a8ebd52c
+
+{
+  "Balance": 1000.00,
+  "Type": 4,
+  "Currency": "USD",
+  "Status": false,
+  "LastTransactionDate": "2024-04-19T12:00:00Z",
+  "InterestRate": 0.025
+}

@@ -98,7 +98,7 @@ func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Pass the customer pointer into the storage and update the database	
+	// Update the database	
 	if err := s.Storage.UpdateCustomer(customer); err != nil {
 		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to update the field in the database: "+err.Error())
 		return

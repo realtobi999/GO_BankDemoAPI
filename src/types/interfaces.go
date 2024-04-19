@@ -22,6 +22,7 @@ type IStorage interface {
 	GetAllAccountsFrom(customerID uuid.UUID, limit int, offset int) ([]Account, error)
 	GetAccount(accountID uuid.UUID, customerID uuid.UUID) (Account, error)
 	CreateAccount(account Account) (int64, error)
+	UpdateAccount(account Account) error
 }
 
 type ISerializable interface {

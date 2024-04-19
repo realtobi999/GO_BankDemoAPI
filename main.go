@@ -46,6 +46,8 @@ func main() {
 		logger.Fatal(err)
 	}
 	logger.LogEvent("Database is successfully connected!")
+
+	//panic(storage.DropMigrations(database.DB, logger))
 	
 	// Run migrations
 	if err := storage.RunMigrations(storage.PathToMigrations,database.DB, logger); err != nil {
@@ -53,6 +55,7 @@ func main() {
 	}
 	logger.LogEvent("Migration are successfully inserted!")
 
+	// Create server struct
 	server := api.NewServer(port, database, logger)
 
 	logger.LogEvent(fmt.Sprintf("Server successfully started on port : %v", server.Port))

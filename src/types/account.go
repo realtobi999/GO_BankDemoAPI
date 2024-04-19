@@ -46,6 +46,15 @@ type CreateAccountRequest struct {
 	Currency string
 }
 
+type UpdateAccountRequest struct {
+	Balance float64
+	Type 	AccountType
+	Currency string
+	Status	bool
+	LastTransactionDate time.Time
+	InterestRate float64
+}
+
 func (r CreateAccountRequest) ToAccount(customerID string) (Account, error) {
 	customerUUID, err := uuid.Parse(customerID)
 	if err != nil {
@@ -64,6 +73,19 @@ func (r CreateAccountRequest) ToAccount(customerID string) (Account, error) {
 		InterestRate:        1.00,
 		CreatedAt:  		 time.Now(),		
 	}, nil
+}
+
+func (r UpdateAccountRequest) ToAccount(accountID, customerID uuid.UUID) Account {
+	return Account{
+		ID: accountID,
+		CustomerID: customerID,
+		Balance: r.Balance,
+		Type: r.Type,
+		Currency: r.Currency,
+		Status: r.Status,
+		LastTransactionDate: r.LastTransactionDate,
+		InterestRate: r.InterestRate,
+	}
 }
 
 func (a Account) ToDTO() DTO {
@@ -102,10 +124,6 @@ func (a Account) Validate() []error {
 
     if a.Currency == "" {
         validationErrors = append(validationErrors, errors.New("Currency cannot be empty"))
-    }
-
-    if a.OpeningDate.IsZero() {
-        validationErrors = append(validationErrors, errors.New("OpeningDate cannot be zero"))
     }
 
     if a.LastTransactionDate.IsZero() {
