@@ -135,3 +135,47 @@ func Test_Account_GetAll_Works(t *testing.T) {
 	assertEqual(t, account1.ID.String(), body.Data[0].ID.String())
 	assertEqual(t, account2.ID.String(), body.Data[1].ID.String())
 }
+
+func Test_Account_Update_Works(t *testing.T) {
+	customer := NewTestCustomer()
+	account := NewTestAccount(customer.ID)
+	account.Status = true
+	account.InterestRate = 1
+
+	server := NewTestServer()
+	server.Storage.ClearAllTables()
+
+	server.Storage.CreateCustomer(customer)
+	server.Storage.CreateAccount(account)
+
+	assertDatabaseMissing(t, "accounts", "status", false, server.Storage)
+	assertDatabaseMissing(t, "accounts", "interest_rate", 0.025, server.Storage)
+
+	body := `
+	{
+		"Balance": 1000.00,
+		"Type": 1,
+		"Currency": "USD",
+		"Status": false,
+		"LastTransactionDate": "2024-04-19T12:00:00Z",
+		"InterestRate": 0.025
+	}`
+		
+	url := fmt.Sprintf("/api/customer/%s/account/%s", account.CustomerID.String(), account.ID.String())
+
+	req, err := http.NewRequest("PUT", url, strings.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Put("/api/customer/{customer_id}/account/{id}", server.TestHandler(server.UpdateAccountHandler))
+	router.ServeHTTP(recorder, req)
+	
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	assertDatabaseHas(t, "accounts", "status", false, server.Storage)
+	assertDatabaseHas(t, "accounts", "interest_rate", 0.025, server.Storage)
+}
