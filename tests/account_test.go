@@ -179,3 +179,31 @@ func Test_Account_Update_Works(t *testing.T) {
 	assertDatabaseHas(t, "accounts", "status", false, server.Storage)
 	assertDatabaseHas(t, "accounts", "interest_rate", 0.025, server.Storage)
 }
+
+func Test_Account_Delete_Works(t *testing.T) {
+	customer := NewTestCustomer()
+	account := NewTestAccount(customer.ID)
+
+	server := NewTestServer()
+	server.Storage.ClearAllTables()
+
+	server.Storage.CreateCustomer(customer)
+	server.Storage.CreateAccount(account)
+
+	assertDatabaseHas(t, "accounts", "id", account.ID.String(), server.Storage)
+
+	url := fmt.Sprintf("/api/customer/%s/account/%s", account.CustomerID.String(), account.ID.String())
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Delete("/api/customer/{customer_id}/account/{id}", server.TestHandler(server.DeleteAccountHandler))
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+	assertDatabaseMissing(t, "accounts", "id", account.ID.String(), server.Storage)
+}

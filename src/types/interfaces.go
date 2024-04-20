@@ -23,6 +23,7 @@ type IStorage interface {
 	GetAccount(accountID uuid.UUID, customerID uuid.UUID) (Account, error)
 	CreateAccount(account Account) (int64, error)
 	UpdateAccount(account Account) error
+	DeleteAccount(accountID uuid.UUID, customerID uuid.UUID) (int64, error)
 }
 
 type ISerializable interface {

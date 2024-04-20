@@ -64,3 +64,6 @@ PUT http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/acco
   "LastTransactionDate": "2024-04-19T12:00:00Z",
   "InterestRate": 0.025
 }
+
+###
+DELETE http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account/99fd0672-6d4b-46d2-9641-ab21a8ebd52c

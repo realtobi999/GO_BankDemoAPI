@@ -127,5 +127,27 @@ func (s *Server) UpdateAccountHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJson(w, http.StatusOK, nil)
 }
 func (s *Server) DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
+	accountID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
 
+	customerID, err := uuid.Parse(chi.URLParam(r, "customer_id"))
+	if err != nil {
+		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
+		return
+	}
+
+	_, err = s.Storage.DeleteAccount(accountID, customerID)
+	if err != nil {
+		if err.Error() == "no rows affected" {
+			RespondWithError(w, s.Logger, http.StatusNotFound, "Customer with that ID doesnt exits!")
+			return
+		}
+		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to delete customer: "+err.Error())
+		return
+	}
+
+	RespondWithJson(w, http.StatusOK, nil)
 }
