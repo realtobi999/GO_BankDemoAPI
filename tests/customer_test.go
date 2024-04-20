@@ -31,7 +31,7 @@ func Test_Customer_GetAll_Works(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	handler := server.TestHandler(server.IndexCustomerHandler)
+	handler := http.HandlerFunc(server.IndexCustomerHandler)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -59,7 +59,7 @@ func Test_Customer_GetAll_FailsWhenNoResults(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	handler := server.TestHandler(server.IndexCustomerHandler)
+	handler := http.HandlerFunc(server.IndexCustomerHandler)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusNotFound, recorder.Code)
@@ -100,7 +100,7 @@ func Test_Customer_GetAll_TestLimitAndOffset(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	handler := server.TestHandler(server.IndexCustomerHandler)
+	handler := http.HandlerFunc(server.IndexCustomerHandler)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -145,7 +145,7 @@ func Test_Customer_GetSpecific_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customers/{id}", server.TestHandler(server.GetCustomerHandler))
+	router.Get("/api/customers/{id}", http.HandlerFunc(server.GetCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -176,7 +176,7 @@ func Test_Customer_GetSpecific_FailsWhenNotFound(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customers/{id}", server.TestHandler(server.GetCustomerHandler))
+	router.Get("/api/customers/{id}", http.HandlerFunc(server.GetCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusNotFound, recorder.Code)
@@ -216,7 +216,7 @@ func Test_Customer_Create_Works(t *testing.T) {
 	}
 	recorder := httptest.NewRecorder()
 
-	handler := server.TestHandler(server.CreateCustomerHandler)
+	handler := http.HandlerFunc(server.CreateCustomerHandler)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusCreated, recorder.Code)
@@ -256,7 +256,7 @@ func Test_Customer_Create_ValidationWorks(t *testing.T) {
 	}
 	recorder := httptest.NewRecorder()
 
-	handler := server.TestHandler(server.CreateCustomerHandler)
+	handler := http.HandlerFunc(server.CreateCustomerHandler)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
@@ -308,7 +308,7 @@ func Test_Customer_Update_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{id}", server.TestHandler(server.UpdateCustomerHandler))
+	router.Put("/api/customer/{id}", http.HandlerFunc(server.UpdateCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -351,7 +351,7 @@ func Test_Customer_Update_ValidationWorks(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{id}", server.TestHandler(server.UpdateCustomerHandler))
+	router.Put("/api/customer/{id}", http.HandlerFunc(server.UpdateCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
@@ -385,7 +385,7 @@ func Test_Customer_Delete_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Delete("/api/customer/{id}", server.TestHandler(server.DeleteCustomerHandler))
+	router.Delete("/api/customer/{id}", http.HandlerFunc(server.DeleteCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
