@@ -171,7 +171,7 @@ func Test_Account_Update_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{customer_id}/account/{id}", server.UpdateAccountHandler)
+	router.Put("/api/customer/{customer_id}/account/{account_id}", server.UpdateAccountHandler)
 	router.ServeHTTP(recorder, req)
 	
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -201,7 +201,7 @@ func Test_Account_Delete_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Delete("/api/customer/{customer_id}/account/{id}", server.DeleteAccountHandler)
+	router.Delete("/api/customer/{customer_id}/account/{account_id}", server.DeleteAccountHandler)
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)

@@ -57,7 +57,7 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the UUID id
-	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	id, err := uuid.Parse(chi.URLParam(r, "account_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
@@ -86,7 +86,7 @@ func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	customer := body.ToCustomer()
 
 	// Set the ID for the body
-	customer.ID, err = uuid.Parse(chi.URLParam(r, "id"))
+	customer.ID, err = uuid.Parse(chi.URLParam(r, "account_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
@@ -108,7 +108,7 @@ func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the UUID id
-	id, err := uuid.Parse(chi.URLParam(r, "id"))
+	id, err := uuid.Parse(chi.URLParam(r, "account_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return

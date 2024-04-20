@@ -67,7 +67,7 @@ func (s *Server) IndexAccountHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJsonAndSerializeList(w, 200, accounts)
 }
 func (s *Server) GetAccountHandler(w http.ResponseWriter, r *http.Request) {
-	accountID, err := uuid.Parse(chi.URLParam(r, "id"))
+	accountID, err := uuid.Parse(chi.URLParam(r, "account_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
 		return
@@ -98,7 +98,7 @@ func (s *Server) UpdateAccountHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountID, err := uuid.Parse(chi.URLParam(r, "id"))
+	accountID, err := uuid.Parse(chi.URLParam(r, "account_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
 		return
@@ -127,7 +127,7 @@ func (s *Server) UpdateAccountHandler(w http.ResponseWriter, r *http.Request) {
 	RespondWithJson(w, http.StatusOK, nil)
 }
 func (s *Server) DeleteAccountHandler(w http.ResponseWriter, r *http.Request) {
-	accountID, err := uuid.Parse(chi.URLParam(r, "id"))
+	accountID, err := uuid.Parse(chi.URLParam(r, "account_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse the UUID")
 		return
