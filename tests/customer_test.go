@@ -145,7 +145,7 @@ func Test_Customer_GetSpecific_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customers/{account_id}", http.HandlerFunc(server.GetCustomerHandler))
+	router.Get("/api/customers/{customer_id}", http.HandlerFunc(server.GetCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -176,7 +176,7 @@ func Test_Customer_GetSpecific_FailsWhenNotFound(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customers/{account_id}", http.HandlerFunc(server.GetCustomerHandler))
+	router.Get("/api/customers/{customer_id}", http.HandlerFunc(server.GetCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusNotFound, recorder.Code)
@@ -221,16 +221,20 @@ func Test_Customer_Create_Works(t *testing.T) {
 
 	assertEqual(t, http.StatusCreated, recorder.Code)
 
-	rBody := struct {
-		Message string            `json:"message"`
-		Status  int               `json:"status"`
-		Data    types.CustomerDTO `json:"data"`
+	rBody := struct{
+		Message string `json:"message"`
+		Status  int    `json:"status"`
+		Data    struct {
+			Customer types.CustomerDTO `json:"customer"`
+			Token string `json:"token"`
+		} `json:"data"`
 	}{}
 	if err := json.NewDecoder(recorder.Body).Decode(&rBody); err != nil {
 		t.Fatal(err)
 	}
 
-	assertDatabaseHas(t, "customers", "id", rBody.Data.ID, server.Storage)
+	assertDatabaseHas(t, "customers", "id", rBody.Data.Customer.ID, server.Storage)
+	assertDatabaseHas(t, "customers", "token", rBody.Data.Token, server.Storage)
 }
 
 func Test_Customer_Create_ValidationWorks(t *testing.T) {
@@ -308,7 +312,7 @@ func Test_Customer_Update_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{account_id}", http.HandlerFunc(server.UpdateCustomerHandler))
+	router.Put("/api/customer/{customer_id}", http.HandlerFunc(server.UpdateCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -351,7 +355,7 @@ func Test_Customer_Update_ValidationWorks(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{account_id}", http.HandlerFunc(server.UpdateCustomerHandler))
+	router.Put("/api/customer/{customer_id}", http.HandlerFunc(server.UpdateCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
@@ -385,7 +389,7 @@ func Test_Customer_Delete_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Delete("/api/customer/{account_id}", http.HandlerFunc(server.DeleteCustomerHandler))
+	router.Delete("/api/customer/{customer_id}", http.HandlerFunc(server.DeleteCustomerHandler))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
