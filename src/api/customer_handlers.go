@@ -19,6 +19,7 @@ func (s *Server) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Convert the body and create types.Customer struct
+	// We also create the Id and the Token and CreatedAt
 	customer := body.ToCustomer()
 
 	if err := customer.Validate(); err != nil {

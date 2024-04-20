@@ -200,13 +200,13 @@ func Test_Customer_Create_Works(t *testing.T) {
 
 	body := fmt.Sprintf(`
 	{
-		"first_name": "%s",
-		"last_name": "%s",
-		"birthday": "1990-01-01T00:00:00Z",
-		"email": "%s",
-		"phone": "%s",
-		"state": "%s",
-		"address": "%s"
+		"FirstName": "%s",
+		"LastName": "%s",
+		"Birthday": "1990-01-01T00:00:00Z",
+		"Email": "%s",
+		"Phone": "%s",
+		"State": "%s",
+		"Address": "%s"
 	}
 	`, customer.FirstName, customer.LastName, customer.Email, customer.Phone, customer.State, customer.Address)
 
@@ -246,11 +246,11 @@ func Test_Customer_Create_ValidationWorks(t *testing.T) {
 	// missing fist_name and state
 	body := fmt.Sprintf(`
 	{
-		"last_name": "%s",
-		"birthday": "1990-01-01T00:00:00Z",
-		"email": "%s",
-		"phone": "%s",
-		"address": "%s"
+		"LastName": "%s",
+		"Birthday": "1990-01-01T00:00:00Z",
+		"Email": "%s",
+		"Phone": "%s",
+		"Address": "%s"
 	}
 	`, customer.LastName, customer.Email, customer.Phone, customer.Address)
 
@@ -293,13 +293,13 @@ func Test_Customer_Update_Works(t *testing.T) {
 
 	body := fmt.Sprintf(`
 	{
-		"first_name": "%s",
-		"last_name": "%s",
-		"birthday": "1990-01-01T00:00:00Z",
-		"email": "john.doe@example.com",
-		"phone": "+420605401050",
-		"state": "%s",
-		"address": "123 Main St"
+		"FirstName": "%s",
+		"LastName": "%s",
+		"Birthday": "1990-01-01T00:00:00Z",
+		"Email": "john.doe@example.com",
+		"Phone": "+420605401050",
+		"State": "%s",
+		"Address": "123 Main St"
 	}
 	`, newFirstName, newLastName, newState)
 
@@ -338,11 +338,11 @@ func Test_Customer_Update_ValidationWorks(t *testing.T) {
 	// missing fist_name and state
 	body := fmt.Sprintf(`
 	{
-		"last_name": "%s",
-		"birthday": "1990-01-01T00:00:00Z",
-		"email": "%s",
-		"phone": "%s",
-		"address": "%s"
+		"LastName": "%s",
+		"Birthday": "1990-01-01T00:00:00Z",
+		"Email": "%s",
+		"Phone": "%s",
+		"Address": "%s"
 	}
 	`, customer.LastName, customer.Email, customer.Phone, customer.Address)
 

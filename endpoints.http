@@ -1,7 +1,7 @@
 @HOST=http://localhost:8080
-@CUSTOMER_ID=
-@ACCOUNT_ID=
-@TOKEN=
+@CUSTOMER_ID=91a136c4-0d91-42d7-9af8-a01d4c098dda
+@ACCOUNT_ID=138c6874-b8ed-4d30-a8fc-d424ebeb6ecb
+@TOKEN=59a89788c708b4c90436affec1d2ec4feb5e3ea263f8686726020c541c62c5b8
 
 
 ### Health Check
@@ -14,13 +14,13 @@ GET {{HOST}}/api/error
 POST {{HOST}}/api/customer
 
 {
-    "first_name": "John",
-    "last_name": "Doe",
-    "birthday": "1990-01-01T00:00:00Z",
-    "email": "john.doe@example.com",
-    "phone": "+420605401050",
-    "state": "Vsetín",
-    "address": "123 Main St"
+    "FirstName": "John",
+    "LastName": "Doe",
+    "BirthDay": "1990-01-01T00:00:00Z",
+    "Email": "john.doe@example.com",
+    "Phone": "+420605401050",
+    "State": "Vsetín",
+    "Address": "123 Main St"
 }
 
 ### Get all customers - params: limit, offset
@@ -34,13 +34,13 @@ PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}
 Authorization: Bearer {{TOKEN}}
 
 {
-    "first_name": "Tobiáš",
-    "last_name": "Filgas",
-    "birthday": "1990-01-01T00:00:00Z",
-    "email": "john.doe@example.com",
-    "phone": "+420605401050",
-    "state": "Vsetín",
-    "address": "123 Main St"
+    "FirstName": "Tobiáš",
+    "LastName": "Filgas",
+    "BirthDay": "1990-01-01T00:00:00Z",
+    "Email": "john.doe@example.com",
+    "Phone": "+420605401050",
+    "State": "Vsetín",
+    "Address": "123 Main St"
 }
 
 ### Delete customer by id
@@ -49,25 +49,26 @@ Authorization: Bearer {{TOKEN}}
 
 ### Create a new account
 POST {{HOST}}/api/customer/{{CUSTOMER_ID}}/account
-Authorization: {{TOKEN}}
+Authorization: Bearer {{TOKEN}}
 
 {
   "Balance": 1000.00,
-  "Type": 1,
-  "Currency": "USD"
+  "Type": 3,
+  "Currency": "USD",
+  "InterestRate": 10.00
 }
 
 ### Get all acounts for a customer
 GET {{HOST}}/api/customer/{{CUSTOMER_ID}}/account
-Authorization: {{TOKEN}}
+Authorization: Bearer {{TOKEN}}
 
 ### Get a specific account by id
 GET {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
-Authorization: {{TOKEN}}
+Authorization: Bearer {{TOKEN}}
 
 ### Update an account
 PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
-Authorization: {{TOKEN}}
+Authorization: Bearer {{TOKEN}}
 
 {
   "Balance": 1000.00,
@@ -80,8 +81,18 @@ Authorization: {{TOKEN}}
 
 ### Delete an account
 DELETE {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
-Authorization: {{TOKEN}}
+Authorization: Bearer {{TOKEN}}
 
 ### Get all transactions made by an account
 GET  {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}/transaction
-Authorization: {{TOKEN}}
+Authorization: Bearer {{TOKEN}}
+
+### Create a new transaction
+POST {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}/transaction
+Authorization: Bearer {{TOKEN}}
+
+{
+    "ReceiverAccountID": "611b6895-60eb-4f7e-a632-44211dd3b724",
+    "Amount": 1000
+}
+

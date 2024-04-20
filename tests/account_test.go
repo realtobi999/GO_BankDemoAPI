@@ -154,7 +154,7 @@ func Test_Account_Update_Works(t *testing.T) {
 	body := `
 	{
 		"Balance": 1000.00,
-		"Type": 1,
+		"Type": 3,
 		"Currency": "USD",
 		"Status": false,
 		"LastTransactionDate": "2024-04-19T12:00:00Z",

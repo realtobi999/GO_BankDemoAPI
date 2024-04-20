@@ -23,35 +23,35 @@ type Customer struct {
 }
 
 type CustomerDTO struct {
-	ID        string    `json:"id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Birthday  time.Time `json:"birthday"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	State     string    `json:"state"`
-	Address   string    `json:"address"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string    
+	FirstName string   
+	LastName  string    
+	Birthday  time.Time 
+	Email     string    
+	Phone     string    
+	State     string    
+	Address   string    
+	CreatedAt time.Time 
 }
 
 type CreateCustomerRequest struct {
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Birthday  time.Time `json:"birthday"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	State     string    `json:"state"`
-	Address   string    `json:"address"`
+	FirstName string   
+	LastName  string    
+	Birthday  time.Time 
+	Email     string    
+	Phone     string    
+	State     string    
+	Address   string    
 }
 
 type UpdateCustomerRequest struct {
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Birthday  time.Time `json:"birthday"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone"`
-	State     string    `json:"state"`
-	Address   string    `json:"address"`
+	FirstName string   
+	LastName  string    
+	Birthday  time.Time 
+	Email     string    
+	Phone     string    
+	State     string    
+	Address   string    
 }
 
 func (c Customer) ToDTO() DTO {

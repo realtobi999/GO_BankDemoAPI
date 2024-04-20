@@ -12,6 +12,7 @@ type AccountType int
 var AccountTypes = map[AccountType]string{
 	1: "Business",
 	2: "Personal",
+	3: "Savings",
 }
 
 type Account struct {
@@ -19,7 +20,7 @@ type Account struct {
 	CustomerID uuid.UUID
 	Balance float64
 	Type AccountType
-	Currency string
+	Currency Currency
 	Status bool
 	OpeningDate time.Time
 	LastTransactionDate time.Time
@@ -32,7 +33,7 @@ type AccountDTO struct {
 	CustomerID uuid.UUID
 	Balance float64
 	Type AccountType
-	Currency string
+	Currency Currency
 	Status bool
 	OpeningDate time.Time
 	LastTransactionDate time.Time
@@ -43,13 +44,14 @@ type AccountDTO struct {
 type CreateAccountRequest struct {
 	Balance float64
 	Type AccountType
-	Currency string
+	Currency Currency
+	InterestRate float64
 }
 
 type UpdateAccountRequest struct {
 	Balance float64
 	Type 	AccountType
-	Currency string
+	Currency Currency
 	Status	bool
 	LastTransactionDate time.Time
 	InterestRate float64
@@ -59,8 +61,8 @@ func (r CreateAccountRequest) ToAccount(customerID string) (Account, error) {
 	customerUUID, err := uuid.Parse(customerID)
 	if err != nil {
 		return Account{}, err
-	} 
-
+	}
+	
 	return Account{
 		ID:                  uuid.New(),
 		CustomerID:          customerUUID,
@@ -70,7 +72,7 @@ func (r CreateAccountRequest) ToAccount(customerID string) (Account, error) {
 		Status:              true,
 		OpeningDate:         time.Now(),
 		LastTransactionDate: time.Now(),
-		InterestRate:        1.00,
+		InterestRate:        r.InterestRate,
 		CreatedAt:  		 time.Now(),		
 	}, nil
 }
@@ -122,9 +124,9 @@ func (a Account) Validate() []error {
         validationErrors = append(validationErrors, errors.New("Invalid account type"))
     }
 
-    if a.Currency == "" {
-        validationErrors = append(validationErrors, errors.New("Currency cannot be empty"))
-    }
+    if _, ok := CurrencyLookupMap[a.Currency]; !ok {
+		validationErrors = append(validationErrors, errors.New("This currency is not supported!"))
+	}
 
     if a.LastTransactionDate.IsZero() {
         validationErrors = append(validationErrors, errors.New("LastTransactionDate cannot be zero"))
@@ -132,7 +134,9 @@ func (a Account) Validate() []error {
 
     if a.InterestRate < 0 {
         validationErrors = append(validationErrors, errors.New("InterestRate cannot be negative"))
-    }
+    } else if a.Type != 3 && a.InterestRate != 0 {
+		validationErrors = append(validationErrors, errors.New("Non-savings account cannot have interest rate"))
+	}
 
     return validationErrors
 }
