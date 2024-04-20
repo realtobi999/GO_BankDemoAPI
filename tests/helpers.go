@@ -11,6 +11,7 @@ import (
 	"github.com/realtobi999/GO_BankDemoApi/src/api"
 	"github.com/realtobi999/GO_BankDemoApi/src/storage"
 	"github.com/realtobi999/GO_BankDemoApi/src/types"
+	"github.com/realtobi999/GO_BankDemoApi/src/utils"
 	"github.com/realtobi999/GO_BankDemoApi/src/utils/logs"
 )
 
@@ -47,6 +48,7 @@ func NewTestCustomer() types.Customer {
 		State:     "CA",
 		Address:   "123 Main St",
 		CreatedAt: time.Now(),
+		Token:	   utils.GenerateToken(),
 	}
 }
 
