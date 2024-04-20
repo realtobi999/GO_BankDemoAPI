@@ -97,7 +97,7 @@ func (p *Postgres) UpdateAccount(account types.Account) error {
     return nil
 }
 
-func (p *Postgres) DeleteAccount(accountID uuid.UUID, customerID uuid.UUID) (int64, error) {
+func (p *Postgres) DeleteAccount(customerID uuid.UUID, accountID uuid.UUID) (int64, error) {
 	query := `DELETE FROM accounts WHERE id = $1 AND customer_id = $2`
 
 	result, err := p.DB.Exec(query, accountID, customerID)

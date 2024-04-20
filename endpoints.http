@@ -1,10 +1,17 @@
-GET http://localhost:8080/api/health
+@HOST=http://localhost:8080
+@CUSTOMER_ID=
+@ACCOUNT_ID=
+@TOKEN=
 
-###
-GET http://localhost:8080/api/error
 
-###
-POST http://localhost:8080/api/customer
+### Health Check
+GET {{HOST}}/api/health
+
+### Error Check
+GET {{HOST}}/api/error
+
+### Create a customer
+POST {{HOST}}/api/customer
 
 {
     "first_name": "John",
@@ -16,14 +23,15 @@ POST http://localhost:8080/api/customer
     "address": "123 Main St"
 }
 
-###
-GET http://localhost:8080/api/customer
+### Get all customers - params: limit, offset
+GET {{HOST}}/api/customer
 
-###
-GET http://localhost:8080/api/customer/c671d852-567e-4724-b3c1-a4f1d0773a7a
+### Get customer by id
+GET {{HOST}}/api/customer/{{CUSTOMER_ID}}
 
-###
-PUT http://localhost:8080/api/customer/48d5716a-c7b4-4551-bfb8-c78c40dab36c
+###  Update customer
+PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}
+Authorization: Bearer {{TOKEN}}
 
 {
     "first_name": "Tobiáš",
@@ -35,11 +43,13 @@ PUT http://localhost:8080/api/customer/48d5716a-c7b4-4551-bfb8-c78c40dab36c
     "address": "123 Main St"
 }
 
-###
-DELETE http://localhost:8080/api/customer/23508041-e7f6-421f-9267-7e2c3762f2aa
+### Delete customer by id
+DELETE {{HOST}}/api/customer/{{CUSTOMER_ID}}
+Authorization: Bearer {{TOKEN}}
 
-###
-POST http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account
+### Create a new account
+POST {{HOST}}/api/customer/{{CUSTOMER_ID}}/account
+Authorization: {{TOKEN}}
 
 {
   "Balance": 1000.00,
@@ -47,14 +57,17 @@ POST http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/acc
   "Currency": "USD"
 }
 
-###
-GET http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account
+### Get all acounts for a customer
+GET {{HOST}}/api/customer/{{CUSTOMER_ID}}/account
+Authorization: {{TOKEN}}
 
-###
-GET http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account/99fd0672-6d4b-46d2-9641-ab21a8ebd52c
+### Get a specific account by id
+GET {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
+Authorization: {{TOKEN}}
 
-###
-PUT http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account/99fd0672-6d4b-46d2-9641-ab21a8ebd52c
+### Update an account
+PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
+Authorization: {{TOKEN}}
 
 {
   "Balance": 1000.00,
@@ -65,5 +78,10 @@ PUT http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/acco
   "InterestRate": 0.025
 }
 
-###
-DELETE http://localhost:8080/api/customer/d56a10bc-2fa6-4605-9e6c-c403c3da89e8/account/99fd0672-6d4b-46d2-9641-ab21a8ebd52c
+### Delete an account
+DELETE {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
+Authorization: {{TOKEN}}
+
+### Get all transactions made by an account
+GET  {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}/transaction
+Authorization: {{TOKEN}}
