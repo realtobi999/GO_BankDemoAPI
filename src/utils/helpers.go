@@ -1,11 +1,17 @@
 package utils
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/realtobi999/GO_BankDemoApi/src/constants"
 )
 
 func CalculateAge(birthday time.Time) int {
@@ -54,4 +60,33 @@ func Decode[T any](r *http.Request) (T, error) {
 		return v, fmt.Errorf("decode json: %w", err)
 	}
 	return v, nil
+}
+
+func GetTokenFromHeader(header string) (string, error){
+	slicedHeader := strings.Split(header, " ")
+
+	switch {
+	case len(slicedHeader) != 2:
+		return "", errors.New("")
+	case slicedHeader[0] != "Bearer":
+		return "", errors.New("missing Bearer")
+	case len(slicedHeader[1]) == 0:
+		return "", errors.New("missing token")
+	case len(slicedHeader[1]) != constants.TOKEN_LENGTH:
+		return "", errors.New("invalid token.")
+	}
+
+	return slicedHeader[1], nil
+}
+
+func GenerateToken() string {
+	tokenBytes := make([]byte, constants.TOKEN_LENGTH/2)
+
+	_, err := rand.Read(tokenBytes)
+	if err != nil {
+		return ""
+	}
+
+	token := hex.EncodeToString(tokenBytes)
+	return token
 }

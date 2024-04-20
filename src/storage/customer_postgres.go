@@ -14,7 +14,7 @@ func (p *Postgres) GetCustomer(id uuid.UUID) (types.Customer, error) {
 
     var customer types.Customer
 
-    err := p.DB.QueryRow(query, id).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address, &customer.CreatedAt)
+    err := p.DB.QueryRow(query, id).Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address, &customer.CreatedAt, &customer.Token)
     if err != nil {
         return types.Customer{}, err
     }
@@ -36,7 +36,7 @@ func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, err
     for rows.Next() {
         var customer types.Customer
 
-        if err := rows.Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address, &customer.CreatedAt); err != nil {
+        if err := rows.Scan(&customer.ID, &customer.FirstName, &customer.LastName, &customer.Birthday, &customer.Email, &customer.Phone, &customer.State, &customer.Address, &customer.CreatedAt, &customer.Token); err != nil {
             return nil, err
         }
 
@@ -57,10 +57,10 @@ func (p *Postgres) GetAllCustomers(limit int, offset int) ([]types.Customer, err
 func (p *Postgres) CreateCustomer(customer types.Customer) (int64, error) {
     query := `
     INSERT INTO customers 
-    (id, first_name, last_name, birthday, email, phone, state, address, created_at) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+    (id, first_name, last_name, birthday, email, phone, state, address, created_at, token) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
-    result, err := p.DB.Exec(query, customer.ID.String(), customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address, customer.CreatedAt)
+    result, err := p.DB.Exec(query, customer.ID.String(), customer.FirstName, customer.LastName, customer.Birthday, customer.Email, customer.Phone, customer.State, customer.Address, customer.CreatedAt, customer.Token)
     if err != nil {
         return 0, err
     }
@@ -115,3 +115,19 @@ func (p *Postgres) DeleteCustomer(id uuid.UUID) (int64, error) {
 
     return rowsAffected, nil
 }
+
+func (p *Postgres) AuthCustomerWithTokenExists(customerID uuid.UUID, token string) (bool, error) {
+    query := `SELECT EXISTS(SELECT 1 FROM customers WHERE id = $1 AND token = $2)`
+
+    var exists bool
+    err := p.DB.QueryRow(query, customerID, token).Scan(&exists)
+    switch {
+    case err == sql.ErrNoRows:
+        return false, nil
+    case err != nil:
+        return false, err
+    default:
+        return exists, nil
+    }
+}
+

@@ -19,7 +19,7 @@ type Customer struct {
 	State     string
 	Address   string
 	CreatedAt time.Time
-	Accounts  []Account
+	Token     string
 }
 
 type CustomerDTO struct {
@@ -68,7 +68,7 @@ func (c Customer) ToDTO() DTO {
 	}
 }
 
-func (r UpdateCustomerRequest) ToCustomer() (Customer) {
+func (r UpdateCustomerRequest) ToCustomer() Customer {
 	return Customer{
 		FirstName: r.FirstName,
 		LastName:  r.LastName,
@@ -77,7 +77,6 @@ func (r UpdateCustomerRequest) ToCustomer() (Customer) {
 		Phone:     r.Phone,
 		State:     r.State,
 		Address:   r.Address,
-		Accounts:  []Account{},
 	}
 }
 
@@ -91,8 +90,8 @@ func (r CreateCustomerRequest) ToCustomer() Customer {
 		Phone:     r.Phone,
 		State:     r.State,
 		Address:   r.Address,
-		Accounts:  []Account{},
 		CreatedAt: time.Now(),
+		Token:     utils.GenerateToken(),
 	}
 }
 

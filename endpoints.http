@@ -17,7 +17,7 @@ POST http://localhost:8080/api/customer
 }
 
 ###
-GET http://localhost:8080/api/customer?offset=2
+GET http://localhost:8080/api/customer
 
 ###
 GET http://localhost:8080/api/customer/c671d852-567e-4724-b3c1-a4f1d0773a7a

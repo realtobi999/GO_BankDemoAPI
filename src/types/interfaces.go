@@ -18,6 +18,7 @@ type IStorage interface {
 	CreateCustomer(customer Customer) (int64, error)
 	UpdateCustomer(customer Customer) error
 	DeleteCustomer(id uuid.UUID) (int64, error)
+	AuthCustomerWithTokenExists(customerID uuid.UUID, token string) (bool, error)
 
 	GetAllAccountsFrom(customerID uuid.UUID, limit int, offset int) ([]Account, error)
 	GetAccount(accountID uuid.UUID, customerID uuid.UUID) (Account, error)

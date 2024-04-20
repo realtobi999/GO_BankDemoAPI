@@ -46,7 +46,6 @@ func NewTestCustomer() types.Customer {
 		Phone:     "123-456-7890",
 		State:     "CA",
 		Address:   "123 Main St",
-		Accounts:  []types.Account{},
 		CreatedAt: time.Now(),
 	}
 }

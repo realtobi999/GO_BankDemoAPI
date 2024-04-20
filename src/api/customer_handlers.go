@@ -32,8 +32,16 @@ func (s *Server) CreateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := struct {
+		Customer types.DTO `json:"customer"`
+		Token    string            `json:"token"`
+	}{
+		Customer: customer.ToDTO(),
+		Token:    customer.Token,
+	}
+
 	w.Header().Set("Location", "/api/customers/"+customer.ID.String())
-	RespondWithJsonAndSerialize(w, http.StatusCreated, customer)
+	RespondWithJson(w, http.StatusCreated, data)
 }
 func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse limit and offset parameters
@@ -45,7 +53,7 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 
 	customers, err := s.Storage.GetAllCustomers(limit, offset)
 	if err != nil {
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			RespondWithError(w, s.Logger, http.StatusNotFound, "No customers found!")
 			return
 		}
@@ -57,7 +65,7 @@ func (s *Server) IndexCustomerHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) GetCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the UUID id
-	id, err := uuid.Parse(chi.URLParam(r, "account_id"))
+	id, err := uuid.Parse(chi.URLParam(r, "customer_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
@@ -86,19 +94,19 @@ func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	customer := body.ToCustomer()
 
 	// Set the ID for the body
-	customer.ID, err = uuid.Parse(chi.URLParam(r, "account_id"))
+	customer.ID, err = uuid.Parse(chi.URLParam(r, "customer_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
 	}
-	
+
 	// Validate
 	if err := customer.Validate(); err != nil {
 		RespondWithValidationErrors(w, s.Logger, http.StatusBadRequest, "Failed to validate request", err)
 		return
 	}
 
-	// Update the database	
+	// Update the database
 	if err := s.Storage.UpdateCustomer(customer); err != nil {
 		RespondWithError(w, s.Logger, http.StatusInternalServerError, "Failed to update the field in the database: "+err.Error())
 		return
@@ -108,7 +116,7 @@ func (s *Server) UpdateCustomerHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) DeleteCustomerHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse the UUID id
-	id, err := uuid.Parse(chi.URLParam(r, "account_id"))
+	id, err := uuid.Parse(chi.URLParam(r, "customer_id"))
 	if err != nil {
 		RespondWithError(w, s.Logger, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
