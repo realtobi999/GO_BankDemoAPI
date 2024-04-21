@@ -11,6 +11,7 @@ type IAccountService interface {
 	Create(customerID uuid.UUID, body domain.CreateAccountRequest) (domain.Account, error)
 	Update(accountID uuid.UUID, body domain.UpdateAccountRequest) (int64, error)
 	Delete(accountID uuid.UUID) (int64, error)
+	IsOwner(customerID, accountID uuid.UUID) (bool, error)
 }
 
 type ICustomerService interface {

@@ -31,7 +31,7 @@ func Test_Middleware_WithToken_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewRouter()
-	router.With(server.WithToken).Delete("/api/customer/{customer_id}", handlers.NewCustomerHandler(server.CustomerService).Delete)
+	router.With(server.TokenAuth).Delete("/api/customer/{customer_id}", handlers.NewCustomerHandler(server.CustomerService).Delete)
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusUnauthorized, recorder.Code)

@@ -15,16 +15,20 @@ func (s *Server) LoadRoutes() {
 			r.Get("/", customerHandler.Index) // Params: Limit, Offset
 			r.Get("/{customer_id}", customerHandler.Get)
 			r.Post("/", customerHandler.Create)
-			r.With(s.WithToken).Put("/{customer_id}", customerHandler.Update)
-			r.With(s.WithToken).Delete("/{customer_id}", customerHandler.Delete)
+			r.With(s.TokenAuth).Put("/{customer_id}", customerHandler.Update)
+			r.With(s.TokenAuth).Delete("/{customer_id}", customerHandler.Delete)
 
-			r.With(s.WithToken).Route("/account", func(r chi.Router) {
+			r.Route("/account", func(r chi.Router) {
 				r.Get("/", accountHandler.Index) // Params: Limit, Offset
 				r.Get("/{account_id}", accountHandler.Get)
 				r.Post("/", accountHandler.Create)
+			})
+
+			r.With(s.TokenAuth, s.AccountOwnerAuth).Route("/{customer_id}/account", func(r chi.Router) {
 				r.Put("/{account_id}", accountHandler.Update)
 				r.Delete("/{account_id}", accountHandler.Delete)
 			})
+
 		})
 
 		r.Route("/transaction", func(r chi.Router) {

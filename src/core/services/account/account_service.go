@@ -110,4 +110,14 @@ func (ac *AccountService) Delete(accountID uuid.UUID) (int64, error) {
 	return affectedRows, nil
 }
 
+func (ac *AccountService) IsOwner(customerID, accountID uuid.UUID) (bool, error) {
+	_, err := ac.AccountRepository.GetAccountByOwner(customerID, accountID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, domain.InternalFailure(err)
+	}
 
+	return true, nil
+}

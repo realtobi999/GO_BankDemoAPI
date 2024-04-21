@@ -13,9 +13,10 @@ type IRepository interface {
 type IAccountRepository interface {
 	GetAllAccounts(limit int, offset int) ([]domain.Account, error)
 	GetAccount(accountID uuid.UUID) (domain.Account, error)
+	GetAccountByOwner(customerID, accountID uuid.UUID) (domain.Account, error)
 	CreateAccount(account domain.Account) (int64, error)
 	UpdateAccount(account domain.Account) (int64, error)
-	DeleteAccount( accountID uuid.UUID) (int64, error)
+	DeleteAccount(accountID uuid.UUID) (int64, error)	
 }
 
 type ICustomerRepository interface {

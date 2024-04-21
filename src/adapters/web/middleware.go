@@ -39,7 +39,7 @@ func (s *Server) Logging(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Server) WithToken(next http.Handler) http.Handler {
+func (s *Server) TokenAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, err := customer.GetTokenFromHeader(r.Header.Get("Authorization"))
 		if err != nil {
@@ -48,7 +48,7 @@ func (s *Server) WithToken(next http.Handler) http.Handler {
 		}
 
 		customerID, err := uuid.Parse(chi.URLParam(r, "customer_id"))
-	if err != nil {
+		if err != nil {
 			handlers.RespondWithError(w, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 			return
 		}
@@ -62,6 +62,34 @@ func (s *Server) WithToken(next http.Handler) http.Handler {
 		if (!authorized) {
 			handlers.RespondWithError(w, http.StatusUnauthorized, "Not authorized! Bad credentials")
 			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (s *Server) AccountOwnerAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		customerID, err := uuid.Parse(chi.URLParam(r, "customer_id"))
+		if err != nil {
+			handlers.RespondWithError(w, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+			return
+		}
+
+		accountID, err := uuid.Parse(chi.URLParam(r, "account_id"))
+		if err != nil {
+			handlers.RespondWithError(w, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+			return
+		}
+
+		isOwner, err := s.AccountService.IsOwner(customerID, accountID)
+		if err != nil {
+			handlers.RespondWithError(w, http.StatusInternalServerError, err.Error())
+			return	
+		}
+
+		if !isOwner {
+			handlers.RespondWithError(w, http.StatusUnauthorized, "Not authorized!")
 		}
 
 		next.ServeHTTP(w, r)

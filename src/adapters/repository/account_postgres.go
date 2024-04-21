@@ -53,6 +53,18 @@ func (p *Postgres) GetAccount(accountID uuid.UUID) (domain.Account, error) {
 	return account, nil
 }
 
+func (p *Postgres) GetAccountByOwner(customerID, accountID uuid.UUID) (domain.Account, error) {
+	query := `SELECT * FROM accounts WHERE id = 1 AND customer_id = $2 LIMIT 1`
+
+	var account domain.Account
+
+	err := p.DB.QueryRow(query, accountID, customerID).Scan(&account.ID, &account.CustomerID, &account.Balance, &account.Type, &account.Currency, &account.Status, &account.OpeningDate, &account.LastTransactionDate, &account.InterestRate, &account.CreatedAt)
+	if err != nil {
+		return domain.Account{}, err
+	}
+
+	return account, nil
+}
 
 func (p *Postgres) CreateAccount(account domain.Account) (int64, error) {
 	query := `
