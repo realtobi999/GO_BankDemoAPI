@@ -8,37 +8,35 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/realtobi999/GO_BankDemoApi/src/api"
-	"github.com/realtobi999/GO_BankDemoApi/src/storage"
-	"github.com/realtobi999/GO_BankDemoApi/src/types"
-	"github.com/realtobi999/GO_BankDemoApi/src/utils"
-	"github.com/realtobi999/GO_BankDemoApi/src/utils/logs"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/web"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/domain"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/ports"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/services/account"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/services/customer"
 )
 
-func NewTestServer() api.Server {
-	db, err := storage.NewPostgres("localhost", "5432", "postgres", "root", "GoBankApiTesting", "disable")
+func NewTestServer(db *repository.Postgres) *web.Server {
+	server := web.NewServer(":8080", chi.NewMux())
+	server.CustomerService = customer.NewCustomerService(db)
+	server.AccountService = account.NewAccountService(db)
+
+	return server
+}
+
+func NewTestDatabase() *repository.Postgres {
+	db, err := repository.NewPostgres("localhost", "5432", "postgres", "root", "GoBankApiTesting", "disable")
 	if err != nil {
 		panic(err)
 	}
 
-	logger := logs.NewLogger("./../"+logs.PathToTestLogs)
+	return db
+} 
 
-	if err := storage.RunMigrations("./../"+storage.PathToMigrations, db.DB, logger); err != nil {
-		panic(err)
-	}
-
-	return api.Server{
-		Port: 8080,
-		Router: chi.NewMux(),
-		Logger: logger,
-		Storage: db,
-	}
-}
-
-func NewTestCustomer() types.Customer {
+func NewTestCustomer() domain.Customer {
 	customerID, _ := uuid.NewRandom()
 
-	return types.Customer{
+	return domain.Customer{
 		ID:        customerID,
 		FirstName: "John",
 		LastName:  "Doe",
@@ -48,12 +46,12 @@ func NewTestCustomer() types.Customer {
 		State:     "CA",
 		Address:   "123 Main St",
 		CreatedAt: time.Now(),
-		Token:	   utils.GenerateToken(),
+		Token:	   customer.GenerateToken(),
 	}
 }
 
-func NewTestAccount(customerID uuid.UUID) types.Account {
-	return types.Account{
+func NewTestAccount(customerID uuid.UUID) domain.Account {
+	return domain.Account{
 		ID:                  uuid.New(),
 		CustomerID:          customerID,
 		Balance:             0.0,
@@ -81,14 +79,14 @@ func assertNotEqual(t *testing.T, expected, actual interface{}) {
 	}
 }
 
-func assertDatabaseHas(t *testing.T, table, column string, value any, s types.IStorage) {
+func assertDatabaseHas(t *testing.T, table, column string, value any, s ports.IRepository) {
 	t.Helper()
 	if !s.DatabaseHas(table, column, value) {
 		t.Errorf("expected %s to have %s = %s", table, column, value)
 	}
 }
 
-func assertDatabaseMissing(t *testing.T, table, column string, value any, s types.IStorage) {
+func assertDatabaseMissing(t *testing.T, table, column string, value any, s ports.IRepository) {
 	t.Helper()
 	if s.DatabaseHas(table, column, value) {
 		t.Errorf("expected %s to have %s = %s", table, column, value)

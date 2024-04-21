@@ -9,7 +9,8 @@ import (
 	"testing"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/realtobi999/GO_BankDemoApi/src/types"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/handlers"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/domain"
 )
 
 func Test_Customer_GetAll_Works(t *testing.T) {
@@ -17,13 +18,15 @@ func Test_Customer_GetAll_Works(t *testing.T) {
 	customer2 := NewTestCustomer()
 	customer3 := NewTestCustomer()
 
-	server := NewTestServer()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+	
 
-	server.Storage.ClearAllTables()
+	db.ClearAllTables()
 
-	server.Storage.CreateCustomer(customer1)
-	server.Storage.CreateCustomer(customer2)
-	server.Storage.CreateCustomer(customer3)
+	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
+	db.CreateCustomer(customer3)
 
 	req, err := http.NewRequest("GET", "/api/customer", nil)
 	if err != nil {
@@ -31,7 +34,7 @@ func Test_Customer_GetAll_Works(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.IndexCustomerHandler)
+	handler := http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Index)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -39,7 +42,7 @@ func Test_Customer_GetAll_Works(t *testing.T) {
 	body := struct {
 		Message string              `json:"message"`
 		Status  int                 `json:"status"`
-		Data    []types.CustomerDTO `json:"data"`
+		Data    []domain.CustomerDTO `json:"data"`
 	}{}
 	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
 		t.Fatal(err)
@@ -49,9 +52,10 @@ func Test_Customer_GetAll_Works(t *testing.T) {
 }
 
 func Test_Customer_GetAll_FailsWhenNoResults(t *testing.T) {
-	server := NewTestServer()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
 
-	server.Storage.ClearAllTables()
+	db.ClearAllTables()
 
 	req, err := http.NewRequest("GET", "/api/customer", nil)
 	if err != nil {
@@ -59,7 +63,7 @@ func Test_Customer_GetAll_FailsWhenNoResults(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.IndexCustomerHandler)
+	handler := http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Index)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusNotFound, recorder.Code)
@@ -72,7 +76,7 @@ func Test_Customer_GetAll_FailsWhenNoResults(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assertEqual(t, body.ErrorMessage, "No customers found!")
+	assertEqual(t, "Error not found: Customers not found", body.ErrorMessage)
 }
 
 func Test_Customer_GetAll_TestLimitAndOffset(t *testing.T) {
@@ -81,14 +85,15 @@ func Test_Customer_GetAll_TestLimitAndOffset(t *testing.T) {
 	customer3 := NewTestCustomer()
 	customer4 := NewTestCustomer()
 
-	server := NewTestServer()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
 
-	server.Storage.ClearAllTables()
+	db.ClearAllTables()
 
-	server.Storage.CreateCustomer(customer1)
-	server.Storage.CreateCustomer(customer2)
-	server.Storage.CreateCustomer(customer3)
-	server.Storage.CreateCustomer(customer4)
+	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
+	db.CreateCustomer(customer3)
+	db.CreateCustomer(customer4)
 
 	offset := 1
 	limit := 2
@@ -100,7 +105,7 @@ func Test_Customer_GetAll_TestLimitAndOffset(t *testing.T) {
 	}
 
 	recorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.IndexCustomerHandler)
+	handler := http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Index)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -108,7 +113,7 @@ func Test_Customer_GetAll_TestLimitAndOffset(t *testing.T) {
 	body := struct {
 		Message string              `json:"message"`
 		Status  int                 `json:"status"`
-		Data    []types.CustomerDTO `json:"data"`
+		Data    []domain.CustomerDTO `json:"data"`
 	}{}
 	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
 		t.Fatal(err)
@@ -127,14 +132,15 @@ func Test_Customer_GetSpecific_Works(t *testing.T) {
 	customer3 := NewTestCustomer()
 	customer4 := NewTestCustomer()
 
-	server := NewTestServer()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
 
-	server.Storage.ClearAllTables()
+	db.ClearAllTables()
 
-	server.Storage.CreateCustomer(customer1)
-	server.Storage.CreateCustomer(customer2)
-	server.Storage.CreateCustomer(customer3)
-	server.Storage.CreateCustomer(customer4)
+	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
+	db.CreateCustomer(customer3)
+	db.CreateCustomer(customer4)
 
 	url := fmt.Sprintf("/api/customers/%s", customer1.ID.String())
 
@@ -145,7 +151,7 @@ func Test_Customer_GetSpecific_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customers/{customer_id}", http.HandlerFunc(server.GetCustomerHandler))
+	router.Get("/api/customers/{customer_id}", http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Get))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -153,7 +159,7 @@ func Test_Customer_GetSpecific_Works(t *testing.T) {
 	body := struct {
 		Message string            `json:"message"`
 		Status  int               `json:"status"`
-		Data    types.CustomerDTO `json:"data"`
+		Data    domain.CustomerDTO `json:"data"`
 	}{}
 	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
 		t.Fatal(err)
@@ -165,7 +171,8 @@ func Test_Customer_GetSpecific_Works(t *testing.T) {
 func Test_Customer_GetSpecific_FailsWhenNotFound(t *testing.T) {
 	customer := NewTestCustomer()
 
-	server := NewTestServer()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
 
 	url := fmt.Sprintf("/api/customers/%s", customer.ID.String())
 
@@ -176,7 +183,7 @@ func Test_Customer_GetSpecific_FailsWhenNotFound(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customers/{customer_id}", http.HandlerFunc(server.GetCustomerHandler))
+	router.Get("/api/customers/{customer_id}", http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Get))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusNotFound, recorder.Code)
@@ -194,9 +201,11 @@ func Test_Customer_GetSpecific_FailsWhenNotFound(t *testing.T) {
 
 func Test_Customer_Create_Works(t *testing.T) {
 	customer := NewTestCustomer()
-	server := NewTestServer()
 
-	server.Storage.ClearAllTables()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.ClearAllTables()
 
 	body := fmt.Sprintf(`
 	{
@@ -216,7 +225,7 @@ func Test_Customer_Create_Works(t *testing.T) {
 	}
 	recorder := httptest.NewRecorder()
 
-	handler := http.HandlerFunc(server.CreateCustomerHandler)
+	handler := http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Create)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusCreated, recorder.Code)
@@ -225,7 +234,6 @@ func Test_Customer_Create_Works(t *testing.T) {
 		Message string `json:"message"`
 		Status  int    `json:"status"`
 		Data    struct {
-			Customer types.CustomerDTO `json:"customer"`
 			Token string `json:"token"`
 		} `json:"data"`
 	}{}
@@ -233,15 +241,23 @@ func Test_Customer_Create_Works(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assertDatabaseHas(t, "customers", "id", rBody.Data.Customer.ID, server.Storage)
-	assertDatabaseHas(t, "customers", "token", rBody.Data.Token, server.Storage)
+	idStartIndex := strings.Index(recorder.Header().Get("Location"), "/api/customers/")
+
+	// Extract the ID portion of the path
+	id := recorder.Header().Get("Location")[idStartIndex+len("/api/customers/"):]
+
+
+	assertDatabaseHas(t, "customers", "id", id, db)
+	assertDatabaseHas(t, "customers", "token", rBody.Data.Token, db)
 }
 
 func Test_Customer_Create_ValidationWorks(t *testing.T) {
 	customer := NewTestCustomer()
-	server := NewTestServer()
 
-	server.Storage.ClearAllTables()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.ClearAllTables()
 
 	// missing fist_name and state
 	body := fmt.Sprintf(`
@@ -260,7 +276,7 @@ func Test_Customer_Create_ValidationWorks(t *testing.T) {
 	}
 	recorder := httptest.NewRecorder()
 
-	handler := http.HandlerFunc(server.CreateCustomerHandler)
+	handler := http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Create)
 	handler.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
@@ -281,11 +297,12 @@ func Test_Customer_Create_ValidationWorks(t *testing.T) {
 func Test_Customer_Update_Works(t *testing.T) {
 	customer1 := NewTestCustomer()
 
-	server := NewTestServer()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
 
-	server.Storage.ClearAllTables()
+	db.ClearAllTables()
 	
-	server.Storage.CreateCustomer(customer1)
+	db.CreateCustomer(customer1)
 
 	newFirstName := "Tobiáš"
 	newLastName := "Filgas"
@@ -312,12 +329,12 @@ func Test_Customer_Update_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{customer_id}", http.HandlerFunc(server.UpdateCustomerHandler))
+	router.Put("/api/customer/{customer_id}", http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Update))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
 
-	updatedCustomer, err := server.Storage.GetCustomer(customer1.ID)
+	updatedCustomer, err := db.GetCustomer(customer1.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -329,11 +346,13 @@ func Test_Customer_Update_Works(t *testing.T) {
 
 func Test_Customer_Update_ValidationWorks(t *testing.T) {
 	customer := NewTestCustomer()
-	server := NewTestServer()
 
-	server.Storage.ClearAllTables()
+	db := NewTestDatabase()
+	server := NewTestServer(db)
 
-	server.Storage.CreateCustomer(customer)
+	db.ClearAllTables()
+
+	db.CreateCustomer(customer)
 
 	// missing fist_name and state
 	body := fmt.Sprintf(`
@@ -355,7 +374,7 @@ func Test_Customer_Update_ValidationWorks(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Put("/api/customer/{customer_id}", http.HandlerFunc(server.UpdateCustomerHandler))
+	router.Put("/api/customer/{customer_id}", http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Update))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
@@ -375,10 +394,12 @@ func Test_Customer_Update_ValidationWorks(t *testing.T) {
 
 func Test_Customer_Delete_Works(t *testing.T) {
 	customer := NewTestCustomer()
-	server := NewTestServer()
 
-	server.Storage.ClearAllTables()
-	server.Storage.CreateCustomer(customer)
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.ClearAllTables()
+	db.CreateCustomer(customer)
 		
 	url := fmt.Sprintf("/api/customer/%s", customer.ID.String())
 
@@ -389,9 +410,10 @@ func Test_Customer_Delete_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Delete("/api/customer/{customer_id}", http.HandlerFunc(server.DeleteCustomerHandler))
+	router.Delete("/api/customer/{customer_id}", http.HandlerFunc(handlers.NewCustomerHandler(server.CustomerService).Delete))
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
-	assertDatabaseMissing(t, "customers", "id", customer.ID, server.Storage);
+	assertDatabaseMissing(t, "customers", "id", customer.ID, db);
+
 }

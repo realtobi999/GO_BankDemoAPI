@@ -1,33 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
-	"strconv"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
-	"github.com/realtobi999/GO_BankDemoApi/src/api"
-	"github.com/realtobi999/GO_BankDemoApi/src/storage"
-	"github.com/realtobi999/GO_BankDemoApi/src/utils/logs"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository/migrations"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/web"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/services/account"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/services/customer"
 )
+
 func main() {
 	clearConsole()
-	printASCII()
+	ASCII()
 
-	
-	// Load the .env file containing Environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("[Error] - Error loading .env file")
 	}
-	
-	// Get the server port
-	port, err := strconv.Atoi(os.Getenv("SERVER_PORT"))
-	if err != nil {
-		log.Fatal("[Error] - Error parsing port from the .env file")
-	}
-	
+
 	// Get database configuration
 	dbConfig := map[string]string{
 		"host":     os.Getenv("DB_HOST"),
@@ -36,28 +30,23 @@ func main() {
 		"password": os.Getenv("DB_PASSWORD"),
 		"dbName":   os.Getenv("DB_NAME"),
 	}
-	
-	// Initiate the logger
-	logger := logs.NewLogger(`src\utils\logs\logs.txt`)
-	
-	// Initiate the database
-	database, err := storage.NewPostgres(dbConfig["host"], dbConfig["port"], dbConfig["username"], dbConfig["password"], dbConfig["dbName"], "disable")
+
+	database, err := repository.NewPostgres(dbConfig["host"], dbConfig["port"], dbConfig["username"], dbConfig["password"], dbConfig["dbName"], "disable")
 	if err != nil {
-		logger.Fatal(err)
+		log.Fatal(err)
 	}
-	logger.LogEvent("Database is successfully connected!")
 
-	//panic(storage.DropMigrations(database.DB, logger))
+	if err := migrations.RunMigrations("src/adapters/repository/migrations/*.sql", database.DB); err != nil {
+		log.Fatal(err)
+	}
+
+	server := web.NewServer(":8080",  chi.NewMux())
+	server.AccountService = account.NewAccountService(database)
+	server.CustomerService = customer.NewCustomerService(database)
+
+	server.LoadSharedMiddleware()
+	server.LoadRoutes()
 	
-	// Run migrations
-	if err := storage.RunMigrations(storage.PathToMigrations,database.DB, logger); err != nil {
-		logger.Fatal(err)
-	}
-	logger.LogEvent("Migration are successfully inserted!")
-
-	// Create server struct
-	server := api.NewServer(port, database, logger)
-
-	logger.LogEvent(fmt.Sprintf("Server successfully started on port : %v", server.Port))
+	defer log.Printf("[EVENT]\tShuting down...")
 	log.Fatal(server.Run())
 }
