@@ -8,6 +8,7 @@ import (
 func (s *Server) LoadRoutes() {
 	accountHandler := handlers.NewAccountHandler(s.AccountService)
 	customerHandler := handlers.NewCustomerHandler(s.CustomerService)
+	transactionsHandler := handlers.NewTransactionHandler(s.TransactionService)
 
 	s.Router.Route("/api", func(r chi.Router) {
 		r.Route("/customer", func(r chi.Router) {
@@ -25,5 +26,10 @@ func (s *Server) LoadRoutes() {
 				r.Delete("/{account_id}", accountHandler.Delete)
 			})
 		})
+
+		r.Route("/transaction", func(r chi.Router) {
+			r.Get("/", transactionsHandler.Index)
+			r.Get("/{transaction_id}", transactionsHandler.Get)	
+		})	
 	})
 }

@@ -12,6 +12,7 @@ type Server struct {
 	Router *chi.Mux
 	AccountService ports.IAccountService
 	CustomerService ports.ICustomerService
+	TransactionService ports.ITransactionService
 }
 
 func NewServer(addr string, router *chi.Mux) *Server {

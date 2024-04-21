@@ -21,3 +21,8 @@ type ICustomerService interface {
 	Delete(customerID uuid.UUID) (int64, error)
 	Auth(customerID uuid.UUID, token string) (bool, error)
 }
+
+type ITransactionService interface {
+	Index(accountID uuid.UUID, limit int, offset int) ([]domain.Transaction, error)
+	Get(transactionID uuid.UUID) (domain.Transaction, error)	
+}

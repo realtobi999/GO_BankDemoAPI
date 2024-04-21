@@ -19,10 +19,16 @@ type IAccountRepository interface {
 }
 
 type ICustomerRepository interface {
-	GetCustomer(id uuid.UUID) (domain.Customer, error)
 	GetAllCustomers(limit int, offset int) ([]domain.Customer, error)
+	GetCustomer(customerID uuid.UUID) (domain.Customer, error)
 	CreateCustomer(customer domain.Customer) (int64, error)
 	UpdateCustomer(customer domain.Customer) (int64, error)
 	DeleteCustomer(customerID uuid.UUID) (int64, error)
 	AuthCustomer(customerID uuid.UUID, token string) (bool, error)
+}
+
+type ITransactionRepository interface {
+	GetAllTransactions(limit, offset int) ([]domain.Transaction, error)
+	GetAllTransactionsFromAccount(accountID uuid.UUID, limit int, offset int) ([]domain.Transaction, error)	
+	GetTransaction(transactionID uuid.UUID) (domain.Transaction, error) 	
 }

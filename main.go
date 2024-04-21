@@ -11,6 +11,7 @@ import (
 	"github.com/realtobi999/GO_BankDemoApi/src/adapters/web"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/services/account"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/services/customer"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/services/transactions"
 )
 
 func main() {
@@ -43,6 +44,7 @@ func main() {
 	server := web.NewServer(":8080",  chi.NewMux())
 	server.AccountService = account.NewAccountService(database)
 	server.CustomerService = customer.NewCustomerService(database)
+	server.TransactionService = transactions.NewTransactionService(database)
 
 	server.LoadSharedMiddleware()
 	server.LoadRoutes()

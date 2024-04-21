@@ -52,9 +52,9 @@ func (a Account) Validate() *ValidationErrors {
     }
 
     if a.CustomerID == uuid.Nil {
-        errors = append(errors, "CustomerID cannot be nil")
-    }
-
+		errors = append(errors, "CustomerID cannot be nil")
+	}
+	
     if a.Balance < 0 {
         errors = append(errors, "Balance cannot be negative")
     }
