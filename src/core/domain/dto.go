@@ -63,3 +63,13 @@ func (c Customer) ToDTO() DTO {
 	}
 }
 /* ------------------------------------------------------------ */
+func (c Transaction) ToDTO() DTO {
+	return TransactionDTO{
+		ID:  c.ID,
+		SenderAccountID: c.SenderAccountID,
+		ReceiverAccountID: c.ReceiverAccountID,
+		Amount: c.Amount,
+		CurrencyPair: c.CurrencyPair.String(),
+		CreatedAt: c.CreatedAt,
+	}
+}

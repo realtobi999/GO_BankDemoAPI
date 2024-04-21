@@ -15,6 +15,16 @@ type Transaction struct {
 	CreatedAt time.Time
 }
 
+type TransactionDTO struct {
+	ID	uuid.UUID
+	SenderAccountID uuid.UUID
+	ReceiverAccountID uuid.UUID
+	Amount float64
+	CurrencyPair string
+	CreatedAt time.Time
+}
+
+
 type CreateTransactionRequest struct {
 	SenderAccountID uuid.UUID
 	ReceiverAccountID uuid.UUID
