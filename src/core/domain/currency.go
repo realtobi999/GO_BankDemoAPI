@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"errors"
+	"strings"
+)
+
 type Currency string
 
 type CurrencyPair struct {
@@ -28,3 +33,16 @@ func (c CurrencyPair) String() string {
 	return CurrencyLookupMap[c.From] + "-" + CurrencyLookupMap[c.To]
 }
 
+func CurrencyPairParse(pair string) (CurrencyPair, error) {
+	pairSplit := strings.Split(pair, "-")
+
+	if len(pairSplit) != 2 {
+		return CurrencyPair{}, errors.New("Bad formatting use: ###-@@@")
+	}
+
+	return CurrencyPair{
+		From: Currency(pairSplit[0]),
+		To:   Currency(pairSplit[1]),
+	}, nil
+	
+}
