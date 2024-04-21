@@ -52,7 +52,8 @@ func (h *CustomerHandler) Get(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, domain.ErrNotFound) {
 			RespondWithError(w, http.StatusNotFound, err.Error())
 			return
-		} else if errors.Is(err, domain.ErrInternalFailure) {
+		}
+		if errors.Is(err, domain.ErrInternalFailure) {
 			RespondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -140,4 +141,6 @@ func (h *CustomerHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	RespondWithJson(w, http.StatusOK, nil)
 }
