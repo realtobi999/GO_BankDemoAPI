@@ -27,6 +27,8 @@ func (s *Server) LoadRoutes() {
 			r.With(s.TokenAuth, s.AccountOwnerAuth).Route("/{customer_id}/account", func(r chi.Router) {
 				r.Put("/{account_id}", accountHandler.Update)
 				r.Delete("/{account_id}", accountHandler.Delete)
+
+				r.Post("/transaction", transactionsHandler.Create)
 			})
 
 		})

@@ -102,3 +102,18 @@ func (p *Postgres) GetTransaction(transactionID uuid.UUID) (domain.Transaction, 
 
 	return transaction, nil
 }
+
+func (p *Postgres) CreateTransaction(transaction domain.Transaction) (int64, error) {
+	query := `
+	INSERT INTO transactions
+	(id, sender_account_id, receiver_account_id, amount, currency, created_at)
+	VALUES ($1, $2, $3, $4, $5, $6)
+	`
+
+	_, err := p.DB.Exec(query, transaction.ID, transaction.SenderAccountID, transaction.ReceiverAccountID, transaction.Amount, transaction.CurrencyPair.String(), transaction.CreatedAt)
+	if err != nil {
+		return 0, err
+	}
+
+	return 1, nil
+}

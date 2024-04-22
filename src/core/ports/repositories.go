@@ -32,4 +32,5 @@ type ITransactionRepository interface {
 	GetAllTransactions(limit, offset int) ([]domain.Transaction, error)
 	GetAllTransactionsFromAccount(accountID uuid.UUID, limit int, offset int) ([]domain.Transaction, error)	
 	GetTransaction(transactionID uuid.UUID) (domain.Transaction, error) 	
+	CreateTransaction(transaction domain.Transaction) (int64, error)
 }

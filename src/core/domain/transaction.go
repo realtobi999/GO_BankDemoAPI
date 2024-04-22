@@ -24,11 +24,10 @@ type TransactionDTO struct {
 	CreatedAt time.Time
 }
 
-
 type CreateTransactionRequest struct {
 	SenderAccountID uuid.UUID
 	ReceiverAccountID uuid.UUID
-	Account float64
+	Amount float64
 	Currency string // The sender preferred currency
 }
 

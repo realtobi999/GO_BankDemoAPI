@@ -26,4 +26,5 @@ type ICustomerService interface {
 type ITransactionService interface {
 	Index(accountID uuid.UUID, limit int, offset int) ([]domain.Transaction, error)
 	Get(transactionID uuid.UUID) (domain.Transaction, error)	
+	Create(body domain.CreateTransactionRequest) (domain.Transaction, error)
 }
