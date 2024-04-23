@@ -54,7 +54,7 @@ func (p *Postgres) GetAccount(accountID uuid.UUID) (domain.Account, error) {
 }
 
 func (p *Postgres) GetAccountByOwner(customerID, accountID uuid.UUID) (domain.Account, error) {
-	query := `SELECT * FROM accounts WHERE id = 1 AND customer_id = $2 LIMIT 1`
+	query := `SELECT * FROM accounts WHERE id = $1 AND customer_id = $2 LIMIT 1`
 
 	var account domain.Account
 

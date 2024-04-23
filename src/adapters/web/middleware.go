@@ -90,6 +90,7 @@ func (s *Server) AccountOwnerAuth(next http.Handler) http.Handler {
 
 		if !isOwner {
 			handlers.RespondWithError(w, http.StatusUnauthorized, "Not authorized!")
+			return	
 		}
 
 		next.ServeHTTP(w, r)
