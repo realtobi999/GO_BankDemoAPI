@@ -44,7 +44,7 @@ func main() {
 	server := web.NewServer(":8080",  chi.NewMux())
 	server.AccountService = account.NewAccountService(database)
 	server.CustomerService = customer.NewCustomerService(database)
-	server.TransactionService = transactions.NewTransactionService(database)
+	server.TransactionService = transactions.NewTransactionService(database, database)
 
 	server.LoadSharedMiddleware()
 	server.LoadRoutes()
