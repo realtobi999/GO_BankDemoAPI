@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository"
+	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository/migrations"
 	"github.com/realtobi999/GO_BankDemoApi/src/adapters/web"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/domain"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/ports"
@@ -20,6 +21,14 @@ func NewTestServer(db *repository.Postgres) *web.Server {
 	server := web.NewServer(":8080", chi.NewMux())
 	server.CustomerService = customer.NewCustomerService(db)
 	server.AccountService = account.NewAccountService(db)
+
+	if err := migrations.DropMigrations(db.DB); err != nil {
+		panic(err)
+	}
+
+	if err := migrations.RunMigrations("./../src/adapters/repository/migrations/*.sql", db.DB); err != nil {
+		panic(err)
+	}
 
 	return server
 }
