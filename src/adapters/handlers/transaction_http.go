@@ -95,6 +95,10 @@ func (h *TransactionHandler) Create(w http.ResponseWriter, r *http.Request) {
 			RespondWithError(w, http.StatusNotFound, err.Error())
 			return
 		}
+		if errors.Is(err, domain.ErrBadRequest) {
+			RespondWithError(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		if errors.Is(err, domain.ErrValidation) {
 			RespondWithValidationErrors(w, http.StatusBadRequest, "Failed to validate request", domain.ExtractValidationErrorsToList(err))
 			return

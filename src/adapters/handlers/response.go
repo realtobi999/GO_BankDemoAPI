@@ -21,7 +21,7 @@ type ErrorResponse struct {
 }
 
 type multipleErrorResponse struct {
-	ErrorMessage string   `json:"message"`
+	ErrorMessage string   `json:"error_message"`
 	Code         int      `json:"status"`
 	Errors       []string `json:"errors"`
 }

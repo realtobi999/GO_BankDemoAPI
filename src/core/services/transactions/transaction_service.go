@@ -94,6 +94,11 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 		return domain.Transaction{}, domain.ValidationError(err)
 	}
 
+	// Validate that the sender can send the money
+	if (sender.Balance - transaction.Amount) < 0 {
+		return domain.Transaction{}, domain.BadRequestError(errors.New("Sender account doesnt have enough balance"))
+	}
+
 	// Calculate the correct amount to add to the receiver account (With the currency conversion)
 	receiver.Balance += transaction.CurrencyPair.Calculate(transaction.Amount)
 	sender.Balance -= transaction.Amount

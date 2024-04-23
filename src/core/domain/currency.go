@@ -18,8 +18,8 @@ var CurrencyLookupMap = map[Currency]string{
 }
 
 var ConversionRateMap = map[CurrencyPair]float64{
-	{"USD", "EUR"}: 0.85,
-	{"EUR", "USD"}: 1.15,
+	{"USD", "EUR"}: 0.9369,
+	{"EUR", "USD"}: 1.0674,
 }
 
 func NewCurrencyPair(from Currency , to Currency) *CurrencyPair {
