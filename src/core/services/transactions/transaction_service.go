@@ -62,7 +62,7 @@ func (ts *TransactionService) Get(transactionID uuid.UUID) (domain.Transaction, 
 func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (domain.Transaction, error) {
 	transaction := domain.Transaction{
 		ID: uuid.New(),
-		SenderAccountID: body.ReceiverAccountID,
+		SenderAccountID: body.SenderAccountID,
 		ReceiverAccountID: body.ReceiverAccountID,
 		Amount: body.Amount,
 		CreatedAt: time.Now(),
@@ -91,7 +91,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 
 	// Validate the transaction
 	if err := transaction.Validate(); err != nil {
-		return domain.Transaction{}, err
+		return domain.Transaction{}, domain.ValidationError(err)
 	}
 
 	// Calculate the correct amount to add to the receiver account (With the currency conversion)
