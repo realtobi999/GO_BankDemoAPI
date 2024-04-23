@@ -28,7 +28,7 @@ func (s *Server) LoadRoutes() {
 				r.Put("/{account_id}", accountHandler.Update)
 				r.Delete("/{account_id}", accountHandler.Delete)
 
-				r.Post("/transaction", transactionsHandler.Create)
+				r.Post("/{account_id}/transaction", transactionsHandler.Create)
 			})
 
 		})

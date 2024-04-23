@@ -23,7 +23,7 @@ func (p *Postgres) GetAllTransactions(limit, offset int) ([]domain.Transaction, 
 		var transaction domain.Transaction
 		var currencyPair string
 
-		if err := rows.Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, currencyPair, &transaction.CreatedAt); err != nil {
+		if err := rows.Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, &currencyPair, &transaction.CreatedAt); err != nil {
 			return nil ,err		
 		}
 
@@ -63,7 +63,7 @@ func (p *Postgres) GetAllTransactionsFromAccount(accountID uuid.UUID, limit int,
 		var transaction domain.Transaction
 		var currencyPair string
 
-		if err := rows.Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, currencyPair, &transaction.CreatedAt); err != nil {
+		if err := rows.Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, &currencyPair, &transaction.CreatedAt); err != nil {
 			return nil ,err		
 		}
 
@@ -93,8 +93,8 @@ func (p *Postgres) GetTransaction(transactionID uuid.UUID) (domain.Transaction, 
 	var transaction domain.Transaction
 	var currencyPair string
 	
-	err := p.DB.QueryRow(query, transactionID).Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, currencyPair, &transaction.CreatedAt)
-
+	err := p.DB.QueryRow(query, transactionID).Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, &currencyPair, &transaction.CreatedAt)
+	
 	transaction.CurrencyPair, err = domain.CurrencyPairParse(currencyPair)
 	if err != nil {
 		return domain.Transaction{}, fmt.Errorf("Bad currency pair format at transaction id: %s", transaction.ID.String())

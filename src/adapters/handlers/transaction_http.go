@@ -15,8 +15,8 @@ type TransactionHandler struct {
 	TransactionService ports.ITransactionService
 }
 
-func NewTransactionHandler(transactionService ports.ITransactionService) TransactionHandler {
-	return TransactionHandler{
+func NewTransactionHandler(transactionService ports.ITransactionService) *TransactionHandler {
+	return &TransactionHandler{
 		TransactionService: transactionService,
 	}
 }

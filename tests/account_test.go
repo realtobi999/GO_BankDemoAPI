@@ -130,8 +130,8 @@ func Test_Account_GetAll_Works(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// assertEqual(t, account1.ID.String(), body.Data[0].ID.String())
-	// assertEqual(t, account2.ID.String(), body.Data[1].ID.String())
+	assertEqual(t, account1.ID.String(), body.Data[0].ID.String())
+	assertEqual(t, account2.ID.String(), body.Data[1].ID.String())
 }
 
 func Test_Account_Update_Works(t *testing.T) {
