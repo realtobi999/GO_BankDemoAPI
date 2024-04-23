@@ -15,12 +15,14 @@ import (
 	"github.com/realtobi999/GO_BankDemoApi/src/core/ports"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/services/account"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/services/customer"
+	"github.com/realtobi999/GO_BankDemoApi/src/core/services/transactions"
 )
 
 func NewTestServer(db *repository.Postgres) *web.Server {
 	server := web.NewServer(":8080", chi.NewMux())
 	server.CustomerService = customer.NewCustomerService(db)
 	server.AccountService = account.NewAccountService(db)
+	server.TransactionService = transactions.NewTransactionService(db, db)
 
 	if err := migrations.DropMigrations(db.DB); err != nil {
 		panic(err)
