@@ -31,9 +31,9 @@ func Test_Transaction_GetAll_Works(t *testing.T) {
 	server := NewTestServer(db)
 
 	db.CreateCustomer(customer1)
-	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
 	db.CreateAccount(senderAcc)
-	db.CreateAccount(receiverAcc)
+	db.CreateAccount(receiverAcc)	
 
 	db.CreateTransaction(transaction1)
 	db.CreateTransaction(transaction2)
