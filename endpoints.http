@@ -1,0 +1,97 @@
+@HOST=http://localhost:8080
+@CUSTOMER_ID=64eec64f-c594-4006-8ca8-4f5db849e79a
+@ACCOUNT_ID=c6aab306-9538-4756-b2d0-bcb4677b6afc
+@TOKEN=420219914dddb07dda784d47cab24abfc29f5d73f54d85cce0de876f41a67e01
+@TRANSACTION_ID=7a1aab21-b7f2-4b94-b7de-e4f057d20520
+
+### Health Check
+GET {{HOST}}/api/health
+
+### Error Check
+GET {{HOST}}/api/error
+
+### Create a customer
+POST {{HOST}}/api/customer
+
+{
+    "FirstName": "John",
+    "LastName": "Doe",
+    "Birthday": "1990-01-01T00:00:00Z",
+    "Email": "john.doe@example.com",
+    "Phone": "+420605401050",
+    "State": "Vsetín",
+    "Address": "123 Main St"
+}
+
+### Get all customers - params: limit, offset
+GET {{HOST}}/api/customer
+
+### Get customer by id
+GET {{HOST}}/api/customer/{{CUSTOMER_ID}}
+
+###  Update customer
+PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}
+Authorization: Bearer {{TOKEN}}
+
+{
+    "FirstName": "John",
+    "LastName": "Doe",
+    "Birthday": "1990-01-01T00:00:00Z",
+    "Email": "john.doe@example.com",
+    "Phone": "+420605401050",
+    "State": "Vsetín",
+    "Address": "123 Main St"
+}
+
+### Delete customer by id
+DELETE {{HOST}}/api/customer/{{CUSTOMER_ID}}
+Authorization: Bearer {{TOKEN}}
+
+### Create a new account
+POST {{HOST}}/api/customer/{{CUSTOMER_ID}}/account
+Authorization: Bearer {{TOKEN}}
+
+{
+  "Balance": 1000.00,
+  "Type": 1,
+  "Currency": "USD"
+}
+
+### Get all acounts for a customer
+GET {{HOST}}/api/customer/account
+
+### Get a specific account by id
+GET {{HOST}}/api/customer/account/{{ACCOUNT_ID}}
+
+### Update an account
+PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
+Authorization: Bearer {{TOKEN}}
+
+{
+  "Balance": 1000.00,
+  "Type": 4,
+  "Currency": "USD",
+  "Status": false,
+  "LastTransactionDate": "2024-04-19T12:00:00Z",
+  "InterestRate": 0.025
+}
+
+### Delete an account
+DELETE {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
+Authorization: Bearer {{TOKEN}}
+
+### Get all transactions
+GET {{HOST}}/api/transaction
+
+### Get specific transaction by id
+GET {{HOST}}/api/transaction/{{TRANSACTION_ID}}
+
+###
+POST {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}/transaction
+Authorization: Bearer {{TOKEN}}
+
+{
+  	"ReceiverAccountID": "fc20472e-2000-4535-a909-ee8a91a4204d",
+ 	"Amount": 100,
+	"Currency": "USD"
+}

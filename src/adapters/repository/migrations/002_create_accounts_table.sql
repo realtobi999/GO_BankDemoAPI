@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS accounts (
     id UUID PRIMARY KEY,
-    customer_id UUID NOT NULL,
+    customer_id UUID REFERENCES customers(id) NOT NULL,
     balance FLOAT,
     account_type VARCHAR(255),
     currency VARCHAR(255),
