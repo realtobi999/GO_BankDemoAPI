@@ -41,7 +41,7 @@ func Test_Transaction_GetAll_Works(t *testing.T) {
 	db.CreateTransaction(transaction4)
 	db.CreateTransaction(transaction5)
 
-	req, err := http.NewRequest("GET", "/api/transactions", nil)
+	req, err := http.NewRequest("GET", "/api/transaction", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func Test_Transaction_GetAll_GivesErrorWhenNothingFound(t *testing.T) {
 	db := NewTestDatabase()
 	server := NewTestServer(db)
 
-	req, err := http.NewRequest("GET", "/api/transactions", nil)
+	req, err := http.NewRequest("GET", "/api/transaction", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,6 +94,89 @@ func Test_Transaction_GetAll_GivesErrorWhenNothingFound(t *testing.T) {
 	assertEqual(t, "Error not found: Transactions not found", body.ErrorMessage)
 }
 
+func Test_Transaction_Get_Works(t *testing.T) {
+	customer1 := NewTestCustomer()
+	customer2 := NewTestCustomer()
+
+	senderAcc := NewTestAccount(customer1.ID)
+	receiverAcc := NewTestAccount(customer2.ID)
+
+	transaction := NewTestTransaction(senderAcc.ID, receiverAcc.ID)
+
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
+	db.CreateAccount(senderAcc)
+	db.CreateAccount(receiverAcc)
+	db.CreateTransaction(transaction)
+
+	url := fmt.Sprintf("/api/transaction/%s", transaction.ID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}	
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Get("/api/transaction/{transaction_id}", handlers.NewTransactionHandler(server.TransactionService).Get)
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	body := struct {
+		Message string                  `json:"message"`
+		Code    int                     `json:"code"`
+		Data    domain.TransactionDTO `json:"data"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, transaction.ID, body.Data.ID)
+}
+
+func Test_Transaction_Get_GivesErrorWhenNotExist(t *testing.T) {
+	customer1 := NewTestCustomer()
+	customer2 := NewTestCustomer()
+
+	senderAcc := NewTestAccount(customer1.ID)
+	receiverAcc := NewTestAccount(customer2.ID)
+
+	transaction := NewTestTransaction(senderAcc.ID, receiverAcc.ID)
+
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
+	db.CreateAccount(senderAcc)
+	db.CreateAccount(receiverAcc)
+
+	url := fmt.Sprintf("/api/transaction/%s", transaction.ID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}	
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Get("/api/transaction/{transaction_id}", handlers.NewTransactionHandler(server.TransactionService).Get)
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusNotFound, recorder.Code)
+
+	body := struct {
+		ErrorMessage string                  `json:"error_message"`
+		Code    int                     `json:"code"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, "Error not found: Transaction not found", body.ErrorMessage)
+}
 
 func Test_Transaction_Create_Works(t *testing.T) {
 	customer1 := NewTestCustomer()
