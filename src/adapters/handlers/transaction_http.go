@@ -28,8 +28,8 @@ func (h *TransactionHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var accountID uuid.UUID
-	accountIDStr := chi.URLParam(r, "account_id")
+	accountID := uuid.Nil
+	accountIDStr := r.URL.Query().Get("account_id")
 	if accountIDStr != "" {
 		accountID, err = uuid.Parse(accountIDStr)
 		if err != nil {

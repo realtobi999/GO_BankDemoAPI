@@ -12,14 +12,14 @@ func (s *Server) LoadRoutes() {
 
 	s.Router.Route("/api", func(r chi.Router) {
 		r.Route("/customer", func(r chi.Router) {
-			r.Get("/", customerHandler.Index) // Params: Limit, Offset
+			r.Get("/", customerHandler.Index) // Params: limit, offset
 			r.Get("/{customer_id}", customerHandler.Get)
 			r.Post("/", customerHandler.Create)
 			r.With(s.TokenAuth).Put("/{customer_id}", customerHandler.Update)
 			r.With(s.TokenAuth).Delete("/{customer_id}", customerHandler.Delete)
 
 			r.Route("/account", func(r chi.Router) {
-				r.Get("/", accountHandler.Index) // Params: Limit, Offset
+				r.Get("/", accountHandler.Index) // Params: limit, offset
 				r.Get("/{account_id}", accountHandler.Get)
 			})
 
@@ -34,8 +34,8 @@ func (s *Server) LoadRoutes() {
 		})
 
 		r.Route("/transaction", func(r chi.Router) {
-			r.Get("/", transactionsHandler.Index)
-			r.Get("/{transaction_id}", transactionsHandler.Get)	
-		})	
+			r.Get("/", transactionsHandler.Index) // Params: limit, offset, account_id
+			r.Get("/{transaction_id}", transactionsHandler.Get)
+		})
 	})
 }

@@ -68,6 +68,117 @@ func Test_Transaction_GetAll_Works(t *testing.T) {
 	assertEqual(t, transaction5.ID.String(), body.Data[4].ID.String())	
 }
 
+func Test_Transaction_GetAll_FilterByAccountWorks(t *testing.T) {
+	customer := NewTestCustomer()
+
+	account1 := NewTestAccount(customer.ID)
+	account2 := NewTestAccount(customer.ID)
+	account3 := NewTestAccount(customer.ID)
+
+	transaction1 := NewTestTransaction(account1.ID, account2.ID)
+	transaction2 := NewTestTransaction(account1.ID, account2.ID)
+	transaction3 := NewTestTransaction(account1.ID, account2.ID)
+	transaction4 := NewTestTransaction(account2.ID, account3.ID)
+
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.CreateCustomer(customer)
+
+	db.CreateAccount(account1)
+	db.CreateAccount(account2)
+	db.CreateAccount(account3)
+
+	db.CreateTransaction(transaction1)
+	db.CreateTransaction(transaction2)
+	db.CreateTransaction(transaction3)
+	db.CreateTransaction(transaction4)
+
+	url := fmt.Sprintf("/api/transaction?account_id=%s", account1.ID.String())
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(handlers.NewTransactionHandler(server.TransactionService).Index)
+	handler.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	body := struct {
+		Message string                  `json:"message"`
+		Code    int                     `json:"code"`
+		Data    []domain.TransactionDTO `json:"data"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}	
+	assertEqual(t, 3, len(body.Data))
+
+	assertEqual(t, transaction1.ID.String(), body.Data[0].ID.String())
+	assertEqual(t, transaction2.ID.String(), body.Data[1].ID.String())
+	assertEqual(t, transaction3.ID.String(), body.Data[2].ID.String())
+
+	assertEqual(t, account1.ID.String(), body.Data[0].SenderAccountID.String())
+	assertEqual(t, account1.ID.String(), body.Data[1].SenderAccountID.String())
+	assertEqual(t, account1.ID.String(), body.Data[2].SenderAccountID.String())
+}
+
+func Test_Transaction_GetAll_LimitAndOffsetWorks(t *testing.T) {
+	customer := NewTestCustomer()
+
+	account1 := NewTestAccount(customer.ID)
+	account2 := NewTestAccount(customer.ID)
+	account3 := NewTestAccount(customer.ID)
+
+	transaction1 := NewTestTransaction(account1.ID, account2.ID)
+	transaction2 := NewTestTransaction(account1.ID, account2.ID)
+	transaction3 := NewTestTransaction(account1.ID, account2.ID)
+	transaction4 := NewTestTransaction(account2.ID, account3.ID)
+
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.CreateCustomer(customer)
+
+	db.CreateAccount(account1)
+	db.CreateAccount(account2)
+	db.CreateAccount(account3)
+
+	db.CreateTransaction(transaction1)
+	db.CreateTransaction(transaction2)
+	db.CreateTransaction(transaction3)
+	db.CreateTransaction(transaction4)
+
+	url := fmt.Sprintf("/api/transaction?limit=1&offset=2")
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	handler := http.HandlerFunc(handlers.NewTransactionHandler(server.TransactionService).Index)
+	handler.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	body := struct {
+		Message string                  `json:"message"`
+		Code    int                     `json:"code"`
+		Data    []domain.TransactionDTO `json:"data"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, 1, len(body.Data))
+
+	assertEqual(t, transaction3.ID.String(), body.Data[0].ID.String())
+}
+
 func Test_Transaction_GetAll_GivesErrorWhenNothingFound(t *testing.T) {
 	db := NewTestDatabase()
 	server := NewTestServer(db)
