@@ -75,7 +75,6 @@ func (h *AccountHandler) Create(w http.ResponseWriter, r *http.Request) {
 		RespondWithError(w, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 		return
 	}
-
 	
 	account, err := h.AccountService.Create(customerID, body)
 	if err != nil {
@@ -142,4 +141,6 @@ func (h *AccountHandler) Delete(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	RespondWithJson(w, http.StatusOK, nil)
 }
