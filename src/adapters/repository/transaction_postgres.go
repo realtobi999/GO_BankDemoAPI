@@ -94,6 +94,9 @@ func (p *Postgres) GetTransaction(transactionID uuid.UUID) (domain.Transaction, 
 	var currencyPair string
 	
 	err := p.DB.QueryRow(query, transactionID).Scan(&transaction.ID, &transaction.SenderAccountID, &transaction.ReceiverAccountID, &transaction.Amount, &currencyPair, &transaction.CreatedAt)
+	if err != nil {
+		return domain.Transaction{}, err
+	}
 	
 	transaction.CurrencyPair, err = domain.CurrencyPairParse(currencyPair)
 	if err != nil {
