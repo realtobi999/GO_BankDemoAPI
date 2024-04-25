@@ -40,6 +40,39 @@ func (p *Postgres) GetAllAccounts(limit int, offset int) ([]domain.Account, erro
 
 }
 
+func (p *Postgres) GetAllAccountsByCustomer(customerID uuid.UUID, limit int, offset int) ([]domain.Account, error) {
+	query := `SELECT * FROM accounts WHERE customer_id = $1 ORDER BY created_at LIMIT $2 OFFSET $3`
+
+	rows, err := p.DB.Query(query, customerID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []domain.Account
+
+	for rows.Next() {
+		var account domain.Account
+
+		if err := rows.Scan(&account.ID, &account.CustomerID, &account.Balance, &account.Type, &account.Currency, &account.Status, &account.OpeningDate, &account.LastTransactionDate, &account.InterestRate, &account.CreatedAt); err != nil {
+			return nil, err
+		}
+
+		accounts = append(accounts, account)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(accounts) == 0 {
+		return nil, sql.ErrNoRows
+	}
+
+	return accounts, nil
+
+}
+
 func (p *Postgres) GetAccount(accountID uuid.UUID) (domain.Account, error) {
 	query := `SELECT * FROM accounts WHERE id = $1 LIMIT 1`
 

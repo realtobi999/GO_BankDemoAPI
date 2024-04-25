@@ -29,9 +29,8 @@ func (h *TransactionHandler) Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	accountID := uuid.Nil
-	accountIDStr := r.URL.Query().Get("account_id")
-	if accountIDStr != "" {
-		accountID, err = uuid.Parse(accountIDStr)
+	if r.URL.Query().Get("account_id") != ""{
+		accountID, err = uuid.Parse(r.URL.Query().Get("account_id"))
 		if err != nil {
 			RespondWithError(w, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
 			return

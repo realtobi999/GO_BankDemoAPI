@@ -28,7 +28,16 @@ func (h *AccountHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accounts, err := h.AccountService.Index(limit, offset)
+	customerID := uuid.Nil
+	if  r.URL.Query().Get("customer_id") != "" {
+		customerID, err = uuid.Parse(r.URL.Query().Get("customer_id"))
+		if err != nil {
+			RespondWithError(w, http.StatusBadRequest, "Failed to parse UUID: "+err.Error())
+			return
+		}
+	}
+
+	accounts, err := h.AccountService.Index(customerID, limit, offset)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			RespondWithError(w, http.StatusNotFound, err.Error())

@@ -64,7 +64,7 @@ func Test_Account_Create_ValidationWorks(t *testing.T) {
 		"Type": 134,
 		"Currency": "USD"
 	}`
-	
+
 	url := fmt.Sprintf("/api/customer/%s/account", customer.ID.String())
 
 	req, err := http.NewRequest("POST", url, strings.NewReader(body))
@@ -79,7 +79,7 @@ func Test_Account_Create_ValidationWorks(t *testing.T) {
 
 	assertEqual(t, http.StatusBadRequest, recorder.Code)
 
-	rBody := struct{
+	rBody := struct {
 		ErrorMessage string   `json:"message"`
 		Code         int      `json:"status"`
 		Errors       []string `json:"errors"`
@@ -87,7 +87,6 @@ func Test_Account_Create_ValidationWorks(t *testing.T) {
 	if err := json.NewDecoder(recorder.Body).Decode(&rBody); err != nil {
 		t.Fatal(err)
 	}
-
 
 	assertEqual(t, true, slices.Contains(rBody.Errors, "Balance cannot be negative"))
 	assertEqual(t, true, slices.Contains(rBody.Errors, "Invalid account type"))
@@ -107,7 +106,7 @@ func Test_Account_GetAll_Works(t *testing.T) {
 	db.CreateAccount(account1)
 	db.CreateAccount(account2)
 
-	url := fmt.Sprintf("/api/customer/%s/account", customer.ID.String())
+	url := fmt.Sprintf("/api/account")
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -116,7 +115,7 @@ func Test_Account_GetAll_Works(t *testing.T) {
 	recorder := httptest.NewRecorder()
 
 	router := chi.NewMux()
-	router.Get("/api/customer/{customer_id}/account", handlers.NewAccountHandler(server.AccountService).Index)
+	router.Get("/api/account", handlers.NewAccountHandler(server.AccountService).Index)
 	router.ServeHTTP(recorder, req)
 
 	assertEqual(t, http.StatusOK, recorder.Code)
@@ -124,7 +123,7 @@ func Test_Account_GetAll_Works(t *testing.T) {
 	body := struct {
 		Message string              `json:"message"`
 		Status  int                 `json:"status"`
-		Data    []domain.AccountDTO    `json:"data"`
+		Data    []domain.AccountDTO `json:"data"`
 	}{}
 	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
 		t.Fatal(err)
@@ -132,6 +131,56 @@ func Test_Account_GetAll_Works(t *testing.T) {
 
 	assertEqual(t, account1.ID.String(), body.Data[0].ID.String())
 	assertEqual(t, account2.ID.String(), body.Data[1].ID.String())
+}
+
+func Test_Account_GetAll_FilterByCustomerWorks(t *testing.T) {
+	customer := NewTestCustomer()
+	customer2 := NewTestCustomer()
+
+	account1 := NewTestAccount(customer.ID)
+	account2 := NewTestAccount(customer.ID)
+	account3 := NewTestAccount(customer2.ID)
+	account4 := NewTestAccount(customer2.ID)
+	account5 := NewTestAccount(customer2.ID)
+
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.ClearAllTables()
+	db.CreateCustomer(customer)
+	db.CreateAccount(account1)
+	db.CreateAccount(account2)
+	db.CreateAccount(account3)
+	db.CreateAccount(account4)
+	db.CreateAccount(account5)
+
+	url := fmt.Sprintf("/api/account")
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewMux()
+	router.Get("/api/account", handlers.NewAccountHandler(server.AccountService).Index)
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusOK, recorder.Code)
+
+	body := struct {
+		Message string              `json:"message"`
+		Status  int                 `json:"status"`
+		Data    []domain.AccountDTO `json:"data"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&body); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, account1.ID.String(), body.Data[0].ID.String())
+	assertEqual(t, account2.ID.String(), body.Data[1].ID.String())
+
+	assertEqual(t, 2, len(body.Data))
 }
 
 func Test_Account_Update_Works(t *testing.T) {
@@ -159,7 +208,7 @@ func Test_Account_Update_Works(t *testing.T) {
 		"LastTransactionDate": "2024-04-19T12:00:00Z",
 		"InterestRate": 0.025
 	}`
-		
+
 	url := fmt.Sprintf("/api/customer/%s/account/%s", account.CustomerID.String(), account.ID.String())
 
 	req, err := http.NewRequest("PUT", url, strings.NewReader(body))
@@ -172,7 +221,7 @@ func Test_Account_Update_Works(t *testing.T) {
 	router := chi.NewMux()
 	router.Put("/api/customer/{customer_id}/account/{account_id}", handlers.NewAccountHandler(server.AccountService).Update)
 	router.ServeHTTP(recorder, req)
-	
+
 	assertEqual(t, http.StatusOK, recorder.Code)
 
 	assertDatabaseHas(t, "accounts", "status", false, db)
@@ -182,7 +231,6 @@ func Test_Account_Update_Works(t *testing.T) {
 func Test_Account_Delete_Works(t *testing.T) {
 	customer := NewTestCustomer()
 	account := NewTestAccount(customer.ID)
-
 
 	db := NewTestDatabase()
 	server := NewTestServer(db)

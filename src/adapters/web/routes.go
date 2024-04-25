@@ -31,7 +31,7 @@ func (s *Server) LoadRoutes() {
 
 		// Account api endpoints
 		r.Route("/account", func(r chi.Router) {
-			r.Get("/", accountHandler.Index) // Params: limit, offset
+			r.Get("/", accountHandler.Index) // Params: limit, offset, customer_id
 			r.Get("/{account_id}", accountHandler.Get)
 		})
 

@@ -22,8 +22,8 @@ var ConversionRateMap = map[CurrencyPair]float64{
 	{"EUR", "USD"}: 1.0674,
 }
 
-func NewCurrencyPair(from Currency , to Currency) *CurrencyPair {
-	return &CurrencyPair{
+func NewCurrencyPair(from Currency , to Currency) CurrencyPair {
+	return CurrencyPair{
 		From: from,
 		To: to,
 	}

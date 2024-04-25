@@ -6,7 +6,7 @@ import (
 )
 
 type IAccountService interface {
-	Index(limit int, offset int) ([]domain.Account, error)
+	Index(customerID uuid.UUID, limit int, offset int) ([]domain.Account, error)
 	Get(accountID uuid.UUID) (domain.Account, error)
 	Create(customerID uuid.UUID, body domain.CreateAccountRequest) (domain.Account, error)
 	Update(accountID uuid.UUID, body domain.UpdateAccountRequest) (int64, error)

@@ -20,8 +20,19 @@ func NewAccountService(accountRepository ports.IAccountRepository) *AccountServi
 	}
 }
 
-func (ac *AccountService) Index(limit int, offset int) ([]domain.Account, error) {
-	accounts, err := ac.AccountRepository.GetAllAccounts(limit, offset)
+func (ac *AccountService) Index(customerID uuid.UUID, limit int, offset int) ([]domain.Account, error) {
+	// Declare variables for accounts and error, because
+	// we can then access them in if/else scope
+	var accounts []domain.Account
+	var err error
+
+	if customerID != uuid.Nil {
+		accounts, err = ac.AccountRepository.GetAllAccountsByCustomer(customerID, limit, offset)
+	} else {
+		accounts, err = ac.AccountRepository.GetAllAccounts(limit, offset)
+	}
+
+	// Handle error for both options
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil,  domain.NotFoundError("Accounts not found")

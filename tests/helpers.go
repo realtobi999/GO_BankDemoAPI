@@ -81,7 +81,7 @@ func NewTestTransaction(senderID uuid.UUID, receiver uuid.UUID) domain.Transacti
 		SenderAccountID: senderID,
 		ReceiverAccountID: receiver,
 		Amount: 0,
-		CurrencyPair: *domain.NewCurrencyPair("USD", "EUR"),
+		CurrencyPair: domain.NewCurrencyPair("USD", "EUR"),
 		CreatedAt: time.Now(),
 	}
 }

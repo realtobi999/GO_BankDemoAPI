@@ -23,7 +23,7 @@ func NewTransactionService(transactionRepository ports.ITransactionRepository, a
 }
 
 func (ts *TransactionService) Index(accountID uuid.UUID, limit int, offset int) ([]domain.Transaction, error) {
-	// Declare variables for transactions, because
+	// Declare variables for transactions and error, because
 	// we can then access them in if/else scope
 	var transactions []domain.Transaction
 	var err error
@@ -87,7 +87,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	}	
 
 	// Create the currency-pair for the transaction
-	transaction.CurrencyPair = *domain.NewCurrencyPair(sender.Currency, receiver.Currency)
+	transaction.CurrencyPair = domain.NewCurrencyPair(sender.Currency, receiver.Currency)
 
 	// Validate the transaction
 	if err := transaction.Validate(); err != nil {
