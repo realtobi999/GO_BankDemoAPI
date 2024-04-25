@@ -17,22 +17,25 @@ func (s *Server) LoadRoutes() {
 			r.Post("/", customerHandler.Create)
 			r.With(s.TokenAuth).Put("/{customer_id}", customerHandler.Update)
 			r.With(s.TokenAuth).Delete("/{customer_id}", customerHandler.Delete)
-
-			r.Route("/account", func(r chi.Router) {
-				r.Get("/", accountHandler.Index) // Params: limit, offset
-				r.Get("/{account_id}", accountHandler.Get)
-			})
-
+	
+			// Endpoints for manipulating account by a customer and creating a transaction
 			r.With(s.TokenAuth).Route("/{customer_id}/account", func(r chi.Router) {
 				r.Post("/", accountHandler.Create)
 				r.With(s.AccountOwnerAuth).Put("/{account_id}", accountHandler.Update)
 				r.With(s.AccountOwnerAuth).Delete("/{account_id}", accountHandler.Delete)
-
+				
 				r.With(s.AccountOwnerAuth).Post("/{account_id}/transaction", transactionsHandler.Create)
 			})
-
+			
 		})
 
+		// Account api endpoints
+		r.Route("/account", func(r chi.Router) {
+			r.Get("/", accountHandler.Index) // Params: limit, offset
+			r.Get("/{account_id}", accountHandler.Get)
+		})
+
+		// Transactions api endpoints
 		r.Route("/transaction", func(r chi.Router) {
 			r.Get("/", transactionsHandler.Index) // Params: limit, offset, account_id
 			r.Get("/{transaction_id}", transactionsHandler.Get)

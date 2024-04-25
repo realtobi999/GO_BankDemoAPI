@@ -75,7 +75,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 			return domain.Transaction{}, domain.NotFoundError("Account not found")
 		}
 		return domain.Transaction{}, domain.InternalFailure(err)
-	}	
+	}
 
 	// Get the receiver account
 	receiver, err := ts.AccountRepository.GetAccount(transaction.ReceiverAccountID)
@@ -104,7 +104,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	sender.Balance -= transaction.Amount
 
 	// Update all the accounts
-	affected, err := ts.AccountRepository.UpdateAccount(sender)	
+	affected, err := ts.AccountRepository.UpdateAccount(sender)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return domain.Transaction{}, domain.NotFoundError("Account not found")
