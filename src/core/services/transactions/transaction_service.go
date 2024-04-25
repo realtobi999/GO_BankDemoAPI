@@ -39,7 +39,7 @@ func (ts *TransactionService) Index(accountID uuid.UUID, limit int, offset int) 
 	// Handle error for both options
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, domain.NotFoundError("Transactions not found")
+			return nil, domain.NotFoundError(errors.New("Transactions not found"))
 		}
 		return nil, domain.InternalFailure(err)
 	}
@@ -51,7 +51,7 @@ func (ts *TransactionService) Get(transactionID uuid.UUID) (domain.Transaction, 
 	transaction, err := ts.TransactionRepository.GetTransaction(transactionID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return domain.Transaction{}, domain.NotFoundError("Transaction not found")
+			return domain.Transaction{}, domain.NotFoundError(errors.New("Transaction not found"))
 		}
 		return domain.Transaction{}, domain.InternalFailure(err)
 	}	
@@ -72,7 +72,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	sender, err := ts.AccountRepository.GetAccount(transaction.SenderAccountID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return domain.Transaction{}, domain.NotFoundError("Account not found")
+			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
 		return domain.Transaction{}, domain.InternalFailure(err)
 	}
@@ -81,7 +81,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	receiver, err := ts.AccountRepository.GetAccount(transaction.ReceiverAccountID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return domain.Transaction{}, domain.NotFoundError("Account not found")
+			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
 		return domain.Transaction{}, domain.InternalFailure(err)
 	}	
@@ -107,7 +107,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	affected, err := ts.AccountRepository.UpdateAccount(sender)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return domain.Transaction{}, domain.NotFoundError("Account not found")
+			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
 		return domain.Transaction{}, domain.InternalFailure(err)
 	}
@@ -119,7 +119,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	affected, err = ts.AccountRepository.UpdateAccount(receiver)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return domain.Transaction{}, domain.NotFoundError("Account not found")
+			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
 		return domain.Transaction{}, domain.InternalFailure(err)
 	}

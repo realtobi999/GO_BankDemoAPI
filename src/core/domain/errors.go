@@ -29,8 +29,8 @@ func BadRequestError(err error) error {
 	return fmt.Errorf("%w: %s", ErrBadRequest, err.Error())
 }
 
-func NotFoundError(message string) error {
-	return fmt.Errorf("%w: "+message, ErrNotFound)
+func NotFoundError(err error) error {
+	return fmt.Errorf("%w: %s", ErrNotFound, err.Error())
 }
 
 func ValidationError(err *ValidationErrors) error {

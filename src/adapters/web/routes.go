@@ -26,7 +26,6 @@ func (s *Server) LoadRoutes() {
 				
 				r.With(s.AccountOwnerAuth).Post("/{account_id}/transaction", transactionsHandler.Create)
 			})
-			
 		})
 
 		// Account api endpoints

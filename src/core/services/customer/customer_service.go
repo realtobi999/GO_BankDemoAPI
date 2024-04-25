@@ -26,7 +26,7 @@ func (cs *CustomerService) Index(limit, offset int) ([]domain.Customer, error) {
 	customers, err := cs.CustomerRepository.GetAllCustomers(limit, offset)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, domain.NotFoundError("Customers not found")
+			return nil, domain.NotFoundError(errors.New("Customers not found"))
 		}
 		return nil, domain.InternalFailure(err)
 	}
@@ -38,7 +38,7 @@ func (cs *CustomerService) Get(customerID uuid.UUID) (domain.Customer, error) {
 	customer, err := cs.CustomerRepository.GetCustomer(customerID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return domain.Customer{}, domain.NotFoundError("Customer not found")
+			return domain.Customer{}, domain.NotFoundError(errors.New("Customer not found"))
 		}
 		return domain.Customer{}, domain.InternalFailure(err)
 	}
@@ -91,7 +91,7 @@ func (cs *CustomerService) Update(customerID uuid.UUID, body domain.UpdateCustom
 	affectedRows, err := cs.CustomerRepository.UpdateCustomer(customer)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, domain.NotFoundError("Customer not found")
+			return 0, domain.NotFoundError(errors.New("Customer not found"))
 		}
 		return 0, domain.InternalFailure(err)
 	}
@@ -107,7 +107,7 @@ func (cs *CustomerService) Delete(customerID uuid.UUID) (int64, error) {
 	affectedRows, err := cs.CustomerRepository.DeleteCustomer(customerID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, domain.NotFoundError("Account not found")
+			return 0, domain.NotFoundError(errors.New("Account not found"))
 		}
 		return 0, domain.InternalFailure(err)
 	}
