@@ -1,10 +1,13 @@
 package domain
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+const MAX_TRANSFER_AMOUNT = 10000;
 
 type Transaction struct {
 	ID	uuid.UUID
@@ -48,7 +51,11 @@ func (t Transaction) Validate() *ValidationErrors {
 	if t.Amount <= 0 {
 		errors = append(errors, "Sending amount must be bigger than 0!")
 	}
-
+	
+	if t.Amount > MAX_TRANSFER_AMOUNT {
+		errors = append(errors, "Sending amount must not be bigger than: "+strconv.Itoa(MAX_TRANSFER_AMOUNT))
+	}
+	
 	if _, ok := CurrencyLookupMap[t.CurrencyPair.From]; !ok {
 		errors = append(errors, "This currency is not supported!")
 	}

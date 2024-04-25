@@ -372,7 +372,7 @@ func Test_Transaction_Create_GivesErrorWhenSenderDoesntHaveEnoughBalance(t *test
 	body := fmt.Sprintf(`
 	{
   		"ReceiverAccountID": "%s",
- 	 	"Amount": 1000000000,
+ 	 	"Amount": 1000,
 	  	"Currency": "USD"
 	}
 	`, receiver.ID.String())
@@ -445,4 +445,58 @@ func Test_Transactions_Create_GivesErrorWhenSenderAndReceiverAreTheSame(t *testi
 	}
 
 	assertEqual(t, "Sender and Receiver account cant have the same ID", rBody.Errors[0])
+}
+
+func Test_Transactions_Create_GivesErrorWhenAmountIsBeyondTheMaximum(t *testing.T) {
+	customer1 := NewTestCustomer()	
+	customer2 := NewTestCustomer()
+
+	sender := NewTestAccount(customer1.ID)
+	receiver := NewTestAccount(customer2.ID)
+
+	sender.Balance = 9999999999999;
+
+	transaction := NewTestTransaction(sender.ID, receiver.ID)
+	transaction.Amount = domain.MAX_TRANSFER_AMOUNT * 2
+
+	db := NewTestDatabase()
+	server := NewTestServer(db)
+
+	db.CreateCustomer(customer1)
+	db.CreateCustomer(customer2)
+	db.CreateAccount(sender)
+	db.CreateAccount(receiver)
+
+	body := fmt.Sprintf(`
+	{
+  		"ReceiverAccountID": "%s",
+ 	 	"Amount": %v,
+	  	"Currency": "USD"
+	}
+	`, receiver.ID.String(), transaction.Amount)
+
+	url := fmt.Sprintf("/api/%s/account/%s/transaction", customer1.ID.String(), sender.ID.String())
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := httptest.NewRecorder()
+
+	router := chi.NewRouter()
+	router.Post("/api/{customer_id}/account/{account_id}/transaction", handlers.NewTransactionHandler(server.TransactionService).Create)
+	router.ServeHTTP(recorder, req)
+
+	assertEqual(t, http.StatusBadRequest, recorder.Code)
+
+	rBody := struct {
+		ErrorMessage string `json:"error_message"`
+		Code         int    `json:"code"`
+		Errors       []string `json:"errors"`
+	}{}
+	if err := json.NewDecoder(recorder.Body).Decode(&rBody); err != nil {
+		t.Fatal(err)
+	}
+
+	assertEqual(t, "Sending amount must not be bigger than: 10000", rBody.Errors[0])
 }
