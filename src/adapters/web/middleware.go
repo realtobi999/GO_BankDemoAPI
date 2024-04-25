@@ -1,7 +1,6 @@
 package web
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -22,21 +21,6 @@ func (s *Server) LoadSharedMiddleware() {
 		AllowCredentials: false,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	  }))
-}
-
-func (s *Server) Logging(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[EVENT]\tRequest received: %s %s", r.Method, r.URL.Path)
-		defer func() {
-			if err := recover(); err != nil {
-				log.Printf("[ERROR]\tPanic recovered: %v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			}
-		}()
-
-		next.ServeHTTP(w, r)
-
-	})
 }
 
 func (s *Server) TokenAuth(next http.Handler) http.Handler {

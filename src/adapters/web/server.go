@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -23,5 +24,6 @@ func NewServer(addr string, router *chi.Mux) *Server {
 }
 
 func (s *Server) Run() error {
+	log.Println("[EVENT]\tServer running od address: "+s.Addr)
 	return http.ListenAndServe(s.Addr, s.Router)
 }
