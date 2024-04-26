@@ -13,8 +13,8 @@ type AccountDTO struct {
 	ID                  uuid.UUID
 	CustomerID          uuid.UUID
 	Balance             float64
-	Type                AccountType
-	Currency            Currency
+	Type                string
+	Currency            string
 	Status              bool
 	OpeningDate         time.Time
 	LastTransactionDate time.Time
@@ -27,8 +27,8 @@ func (a Account) ToDTO() DTO {
 		ID: a.ID,
 		CustomerID: a.CustomerID,
 		Balance: a.Balance,
-		Type: a.Type,
-		Currency: a.Currency,
+		Type: AccountLookupMap[a.Type],
+		Currency: CurrencyLookupMap[a.Currency],
 		Status: a.Status,
 		OpeningDate: a.OpeningDate,
 		LastTransactionDate: a.LastTransactionDate,

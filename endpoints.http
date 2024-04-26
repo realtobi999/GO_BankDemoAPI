@@ -1,7 +1,7 @@
 @HOST=http://localhost:8080
-@CUSTOMER_ID=64eec64f-c594-4006-8ca8-4f5db849e79a
+@CUSTOMER_ID=55a5f71e-9534-41fe-a520-f6ad577a8b77
 @ACCOUNT_ID=c6aab306-9538-4756-b2d0-bcb4677b6afc
-@TOKEN=420219914dddb07dda784d47cab24abfc29f5d73f54d85cce0de876f41a67e01
+@TOKEN=7e94415ec8db9e64be4895c476ead990d71b5490a92603bc40a5b96d4221a7df
 @TRANSACTION_ID=7a1aab21-b7f2-4b94-b7de-e4f057d20520
 
 ### Health Check
@@ -58,7 +58,7 @@ Authorization: Bearer {{TOKEN}}
 }
 
 ### Get all acounts for a customer
-GET {{HOST}}/api/customer/account
+GET {{HOST}}/api/account
 
 ### Get a specific account by id
 GET {{HOST}}/api/customer/account/{{ACCOUNT_ID}}

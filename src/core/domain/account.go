@@ -37,7 +37,7 @@ type UpdateAccountRequest struct {
 
 type AccountType int
 
-var AccountTypes = map[AccountType]string{
+var AccountLookupMap = map[AccountType]string{
 	1: "Business",
 	2: "Personal",
 	3: "Savings",
@@ -59,7 +59,7 @@ func (a Account) Validate() *ValidationErrors {
         errors = append(errors, "Balance cannot be negative")
     }
 
-    if _, ok := AccountTypes[a.Type]; !ok {
+    if _, ok := AccountLookupMap[a.Type]; !ok {
         errors = append(errors, "Invalid account type")
     }
 
