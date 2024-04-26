@@ -1,13 +1,16 @@
 package tests
 
 import (
+	"log"
 	"math/rand"
+	"os"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
+	"github.com/joho/godotenv"
 	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository"
 	"github.com/realtobi999/GO_BankDemoApi/src/adapters/repository/migrations"
 	"github.com/realtobi999/GO_BankDemoApi/src/adapters/web"
@@ -36,12 +39,26 @@ func NewTestServer(db *repository.Postgres) *web.Server {
 }
 
 func NewTestDatabase() *repository.Postgres {
-	db, err := repository.NewPostgres("localhost", "5432", "postgres", "root", "GoBankApiTesting", "disable")
+	err := godotenv.Load("./../.env")
 	if err != nil {
-		panic(err)
+		log.Fatal("[Error] - Error loading .env file "+err.Error())
 	}
 
-	return db
+	// Get database configuration
+	dbConfig := map[string]string{
+		"host":     os.Getenv("DB_TEST_HOST"),
+		"port":     os.Getenv("DB_TEST_PORT"),
+		"username": os.Getenv("DB_TEST_USERNAME"),
+		"password": os.Getenv("DB_TEST_PASSWORD"),
+		"dbName":   os.Getenv("DB_TEST_NAME"),
+	}
+
+	database, err := repository.NewPostgres(dbConfig["host"], dbConfig["port"], dbConfig["username"], dbConfig["password"], dbConfig["dbName"], "disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return database
 } 
 
 func NewTestCustomer() domain.Customer {

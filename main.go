@@ -41,14 +41,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := web.NewServer(":8080",  chi.NewMux())
+	server := web.NewServer(os.Getenv("SERVER_PORT"), chi.NewMux())
 	server.AccountService = account.NewAccountService(database)
 	server.CustomerService = customer.NewCustomerService(database)
 	server.TransactionService = transactions.NewTransactionService(database, database)
 
+	defer log.Printf("[EVENT]\tShuting down...")
+
 	server.LoadSharedMiddleware()
 	server.LoadRoutes()
-	
-	defer log.Printf("[EVENT]\tShuting down...")
 	log.Fatal(server.Run())
 }
