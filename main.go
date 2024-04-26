@@ -41,7 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	server := web.NewServer(os.Getenv("SERVER_PORT"), chi.NewMux())
+	server := web.NewServer(":"+os.Getenv("SERVER_PORT"), chi.NewMux())
 	server.AccountService = account.NewAccountService(database)
 	server.CustomerService = customer.NewCustomerService(database)
 	server.TransactionService = transactions.NewTransactionService(database, database)
