@@ -53,7 +53,7 @@ Authorization: Bearer {{TOKEN}}
 
 {
   "Balance": 1000.00,
-  "Type": 1,
+  "Type": 5,
   "Currency": "USD"
 }
 
@@ -61,7 +61,7 @@ Authorization: Bearer {{TOKEN}}
 GET {{HOST}}/api/account
 
 ### Get a specific account by id
-GET {{HOST}}/api/customer/account/{{ACCOUNT_ID}}
+GET {{HOST}}/api/account/{{ACCOUNT_ID}}
 
 ### Update an account
 PUT {{HOST}}/api/customer/{{CUSTOMER_ID}}/account/{{ACCOUNT_ID}}
