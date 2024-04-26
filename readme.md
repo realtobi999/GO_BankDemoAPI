@@ -1,6 +1,6 @@
 # Demo Bank Api Project
 
-## About
+## Summary
 
 - This is a **demo** API for a banking system featuring **CRUD** operations for customers and accounts.
 - Each customer can have multiple accounts.
