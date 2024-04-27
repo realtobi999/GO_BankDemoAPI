@@ -3,6 +3,7 @@ package account
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -131,4 +132,34 @@ func (ac *AccountService) IsOwner(customerID, accountID uuid.UUID) (bool, error)
 	}
 
 	return true, nil
+}
+
+func (ac *AccountService) UpdateBalanceDaily() error {
+    ticker := time.NewTicker(24 * time.Hour)
+    defer ticker.Stop()
+
+    for {
+        select {
+        case <-ticker.C:
+            accounts, err := ac.AccountRepository.GetAllSavingsAccounts()
+            if err != nil {
+                return errors.New("Failed to get accounts: "+err.Error())
+            }
+
+            for _, account := range accounts {
+                account.Balance += account.Balance * account.InterestRate / 365
+
+                affected, err := ac.AccountRepository.UpdateAccount(account)
+                if err != nil {
+                    return errors.New("Failed to update account: "+err.Error())
+                }
+
+                if affected == 0 {
+					return errors.New("Something went wrong: No rows affected")        
+                }
+            }
+
+			log.Printf("[EVENT] - Successfully updated the savings account balance!")
+        }
+    }
 }

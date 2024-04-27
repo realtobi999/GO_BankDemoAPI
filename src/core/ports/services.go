@@ -12,6 +12,7 @@ type IAccountService interface {
 	Update(accountID uuid.UUID, body domain.UpdateAccountRequest) (int64, error)
 	Delete(accountID uuid.UUID) (int64, error)
 	IsOwner(customerID, accountID uuid.UUID) (bool, error)
+	UpdateBalanceDaily() error
 }
 
 type ICustomerService interface {

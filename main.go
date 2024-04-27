@@ -20,7 +20,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("[Error] - Error loading .env file")
+		log.Fatal("[ERROR] - Error loading .env file")
 	}
 
 	// Get database configuration
@@ -46,7 +46,11 @@ func main() {
 	server.CustomerService = customer.NewCustomerService(database)
 	server.TransactionService = transactions.NewTransactionService(database, database)
 
-	defer log.Printf("[EVENT]\tShuting down...")
+	go func(server *web.Server){
+		if err := server.AccountService.UpdateBalanceDaily(); err != nil {
+			log.Fatal("[ERROR] - "+err.Error())
+		}
+	}(server)
 
 	server.LoadSharedMiddleware()
 	server.LoadRoutes()

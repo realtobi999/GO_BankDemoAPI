@@ -13,6 +13,7 @@ type IRepository interface {
 type IAccountRepository interface {
 	GetAllAccounts(limit int, offset int) ([]domain.Account, error)
 	GetAllAccountsByCustomer(customerID uuid.UUID, limit int, offset int) ([]domain.Account, error)
+	GetAllSavingsAccounts() ([]domain.Account, error) 
 	GetAccount(accountID uuid.UUID) (domain.Account, error)
 	GetAccountByOwner(customerID, accountID uuid.UUID) (domain.Account, error)
 	CreateAccount(account domain.Account) (int64, error)
