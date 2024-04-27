@@ -4,10 +4,11 @@
 
 - This is a **demo** API for a banking system featuring **CRUD** operations for customers and accounts.
 - Each customer can have multiple accounts.
+- The project is written in Go and follows hexagonal architecture.
 - Some endpoint are **authenticated** through token and the middleware is also validating if the customer owns the account they want to make a request with.
 - Accounts can conduct transactions, including currency exchange, and everything is stored in a **Postgres** database.
-- The project is written in Go and follows hexagonal architecture.
 - All API endpoints are thoroughly **tested** with over 30 tests in total.
+- Working system for updating saving accounts with their interest rate.
 
 ## Architecture
 
