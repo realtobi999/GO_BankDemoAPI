@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     id UUID PRIMARY KEY,
     customer_id UUID REFERENCES customers(id) NOT NULL,
     balance FLOAT,
-    account_type VARCHAR(255),
+    account_type INTEGER,
     currency VARCHAR(255),
     status BOOLEAN,
     opening_date TIMESTAMP WITH TIME ZONE,
