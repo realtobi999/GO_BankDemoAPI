@@ -24,7 +24,7 @@ import (
 func NewTestServer(db *repository.Postgres) *web.Server {
 	server := web.NewServer(":8080", chi.NewMux())
 	server.CustomerService = customer.NewCustomerService(db)
-	server.AccountService = account.NewAccountService(db)
+	server.AccountService = account.NewAccountService(db, db)
 	server.TransactionService = transactions.NewTransactionService(db, db)
 
 	if err := migrations.DropMigrations(db.DB); err != nil {

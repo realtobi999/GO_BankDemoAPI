@@ -77,3 +77,12 @@ func (p *Postgres) ClearAllTables() error {
 
 	return nil
 }
+
+func (p *Postgres) BeginTransaction() (*sql.Tx, error) {
+	tx, err := p.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	return tx, nil
+}

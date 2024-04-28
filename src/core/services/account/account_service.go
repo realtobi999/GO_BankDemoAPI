@@ -13,11 +13,13 @@ import (
 
 type AccountService struct {
 	AccountRepository ports.IAccountRepository
+	GeneralRepository ports.IRepository
 }
 
-func NewAccountService(accountRepository ports.IAccountRepository) *AccountService {
+func NewAccountService(accountRepository ports.IAccountRepository, generalRepository ports.IRepository) *AccountService {
 	return &AccountService{
 		AccountRepository: accountRepository,
+		GeneralRepository: generalRepository,
 	}
 }
 
@@ -140,7 +142,13 @@ func (ac *AccountService) UpdateBalanceDaily() error {
 
     for {
         select {
-        case <-ticker.C:
+		case <-ticker.C:
+			tx, err := ac.GeneralRepository.BeginTransaction()
+			if err != nil {
+				return errors.New("Failed to begin transaction: "+err.Error())
+			}
+			defer tx.Rollback()
+
             accounts, err := ac.AccountRepository.GetAllSavingsAccounts()
             if err != nil {
                 return errors.New("Failed to get accounts: "+err.Error())
@@ -158,6 +166,10 @@ func (ac *AccountService) UpdateBalanceDaily() error {
 					return errors.New("Something went wrong: No rows affected")        
                 }
             }
+
+			if err := tx.Commit(); err != nil {
+				return errors.New("Failed to commit: "+err.Error())
+			}
 
 			log.Printf("[EVENT] - Successfully updated the savings account balance!")
         }

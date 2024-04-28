@@ -1,12 +1,15 @@
 package ports
 
 import (
+	"database/sql"
+
 	"github.com/google/uuid"
 	"github.com/realtobi999/GO_BankDemoApi/src/core/domain"
 )
 
 type IRepository interface {
 	DatabaseHas(table, column string, value any) bool
+	BeginTransaction() (*sql.Tx, error)
 	ClearAllTables() error
 }
 
