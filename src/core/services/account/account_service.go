@@ -40,7 +40,7 @@ func (ac *AccountService) Index(customerID uuid.UUID, limit int, offset int) ([]
 		if err == sql.ErrNoRows {
 			return nil,  domain.NotFoundError(errors.New("Accounts not found"))
 		}
-		return nil,  domain.InternalFailure(err)
+		return nil,  domain.InternalFailure(errors.New("Failed to get accounts: "+err.Error()))
 	}
 
 	return accounts, nil
@@ -52,7 +52,7 @@ func (ac *AccountService) Get(accountID uuid.UUID) (domain.Account, error) {
 		if err == sql.ErrNoRows {
 			return domain.Account{}, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return domain.Account{}, domain.InternalFailure(err)
+		return domain.Account{}, domain.InternalFailure(errors.New("Failed to get account: "+err.Error()))
 	}
 
 	return account, nil
@@ -77,7 +77,7 @@ func (ac *AccountService) Create(customerID uuid.UUID, body domain.CreateAccount
 
 	_, err := ac.AccountRepository.CreateAccount(account)
 	if err != nil {
-		return domain.Account{}, domain.InternalFailure(err)
+		return domain.Account{}, domain.InternalFailure(errors.New("Failed to create account: "+err.Error()))
 	}
 
 	return account, nil
@@ -99,7 +99,7 @@ func (ac *AccountService) Update(accountID uuid.UUID, body domain.UpdateAccountR
 		if err == sql.ErrNoRows {
 			return 0, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return 0, domain.InternalFailure(err)
+		return 0, domain.InternalFailure(errors.New("Failed to update account: "+err.Error()))
 	}
 
 	if affectedRows == 0 {
@@ -114,7 +114,7 @@ func (ac *AccountService) Delete(accountID uuid.UUID) (int64, error) {
 		if err == sql.ErrNoRows {
 			return 0, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return 0, domain.InternalFailure(err)
+		return 0, domain.InternalFailure(errors.New("Failed to delete account: "+err.Error()))
 	}
 
 	if affectedRows == 0 {
@@ -128,9 +128,10 @@ func (ac *AccountService) IsOwner(customerID, accountID uuid.UUID) (bool, error)
 	_, err := ac.AccountRepository.GetAccountByOwner(customerID, accountID)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			// Return nil as the error so the caller can handle the boolean	
 			return false, nil
 		}
-		return false, domain.InternalFailure(err)
+		return false, domain.InternalFailure(errors.New("Failed to get owner: "+err.Error()))
 	}
 
 	return true, nil

@@ -28,7 +28,7 @@ func (cs *CustomerService) Index(limit, offset int) ([]domain.Customer, error) {
 		if err == sql.ErrNoRows {
 			return nil, domain.NotFoundError(errors.New("Customers not found"))
 		}
-		return nil, domain.InternalFailure(err)
+		return nil, domain.InternalFailure(errors.New("Failed to get customer: "+err.Error()))
 	}
 
 	return customers, nil
@@ -40,7 +40,7 @@ func (cs *CustomerService) Get(customerID uuid.UUID) (domain.Customer, error) {
 		if err == sql.ErrNoRows {
 			return domain.Customer{}, domain.NotFoundError(errors.New("Customer not found"))
 		}
-		return domain.Customer{}, domain.InternalFailure(err)
+		return domain.Customer{}, domain.InternalFailure(errors.New("Failed to get customer: "+err.Error()))
 	}
 
 	return customer, nil
@@ -66,7 +66,7 @@ func (cs *CustomerService) Create(body domain.CreateCustomerRequest) (domain.Cus
 
 	_, err := cs.CustomerRepository.CreateCustomer(customer)
 	if err != nil {
-		return domain.Customer{}, domain.InternalFailure(err)
+		return domain.Customer{}, domain.InternalFailure(errors.New("Failed to create customer: "+err.Error()))
 	}
 
 	return customer, nil
@@ -93,7 +93,7 @@ func (cs *CustomerService) Update(customerID uuid.UUID, body domain.UpdateCustom
 		if err == sql.ErrNoRows {
 			return 0, domain.NotFoundError(errors.New("Customer not found"))
 		}
-		return 0, domain.InternalFailure(err)
+		return 0, domain.InternalFailure(errors.New("Failed to update customer: "+err.Error()))
 	}
 
 	if affectedRows == 0 {
@@ -109,7 +109,7 @@ func (cs *CustomerService) Delete(customerID uuid.UUID) (int64, error) {
 		if err == sql.ErrNoRows {
 			return 0, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return 0, domain.InternalFailure(err)
+		return 0, domain.InternalFailure(errors.New("Failed to delete customer: "+err.Error()))
 	}
 
 	if affectedRows == 0 {

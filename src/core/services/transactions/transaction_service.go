@@ -43,7 +43,7 @@ func (ts *TransactionService) Index(accountID uuid.UUID, limit int, offset int) 
 		if err == sql.ErrNoRows {
 			return nil, domain.NotFoundError(errors.New("Transactions not found"))
 		}
-		return nil, domain.InternalFailure(err)
+		return nil, domain.InternalFailure(errors.New("Failed to get transactions: "+err.Error()))
 	}
 
 	return transactions, nil	
@@ -55,7 +55,7 @@ func (ts *TransactionService) Get(transactionID uuid.UUID) (domain.Transaction, 
 		if err == sql.ErrNoRows {
 			return domain.Transaction{}, domain.NotFoundError(errors.New("Transaction not found"))
 		}
-		return domain.Transaction{}, domain.InternalFailure(err)
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to get transaction: "+err.Error()))
 	}	
 
 	return transaction, nil
@@ -76,7 +76,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 		if err == sql.ErrNoRows {
 			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return domain.Transaction{}, domain.InternalFailure(err)
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to get sender: "+err.Error()))
 	}
 
 	// Get the receiver account
@@ -85,7 +85,7 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 		if err == sql.ErrNoRows {
 			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return domain.Transaction{}, domain.InternalFailure(err)
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to get receiver: "+err.Error()))
 	}	
 
 	// Create the currency-pair for the transaction
@@ -112,34 +112,26 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	defer tx.Rollback()
 
 	// Update all the accounts
-	affected, err := ts.AccountRepository.UpdateAccount(sender)
+	_, err = ts.AccountRepository.UpdateAccount(sender)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return domain.Transaction{}, domain.InternalFailure(err)
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to update sender: "+err.Error()))
 	}
-
-	if affected == 0 {
-		return domain.Transaction{}, domain.InternalFailure(errors.New("No rows affected"))
-	}
-
-	affected, err = ts.AccountRepository.UpdateAccount(receiver)
+	
+	_, err = ts.AccountRepository.UpdateAccount(receiver)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return domain.Transaction{}, domain.NotFoundError(errors.New("Account not found"))
 		}
-		return domain.Transaction{}, domain.InternalFailure(err)
-	}
-
-	if affected == 0 {
-		return domain.Transaction{}, domain.InternalFailure(errors.New("No rows affected"))
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to update receiver: "+err.Error()))
 	}
 
 	// Create the transaction
 	_, err = ts.TransactionRepository.CreateTransaction(transaction)
 	if err != nil {
-		return domain.Transaction{}, domain.InternalFailure(err) 
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to create transaction: "+err.Error())) 
 	}
 
 	if err := tx.Commit(); err != nil {
