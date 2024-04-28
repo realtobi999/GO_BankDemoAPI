@@ -11,14 +11,16 @@ import (
 )
 
 type TransactionService struct {
-	TransactionRepository ports.ITransactionRepository
+	TransactionRepository 	ports.ITransactionRepository
 	AccountRepository		ports.IAccountRepository
+	GeneralRepository		ports.IRepository
 }
 
-func NewTransactionService(transactionRepository ports.ITransactionRepository, accountRepository ports.IAccountRepository) *TransactionService {
+func NewTransactionService(transactionRepository ports.ITransactionRepository, accountRepository ports.IAccountRepository, generalRepository ports.IRepository) *TransactionService {
 	return &TransactionService{
 		TransactionRepository: transactionRepository,
 		AccountRepository: accountRepository,
+		GeneralRepository: generalRepository,
 	}
 }
 
@@ -103,6 +105,12 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	receiver.Balance += transaction.CurrencyPair.Calculate(transaction.Amount)
 	sender.Balance -= transaction.Amount
 
+	tx, err := ts.GeneralRepository.BeginTransaction()
+	if err != nil {
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to start a transaction: "+err.Error()))
+	}	
+	defer tx.Rollback()
+
 	// Update all the accounts
 	affected, err := ts.AccountRepository.UpdateAccount(sender)
 	if err != nil {
@@ -132,6 +140,10 @@ func (ts *TransactionService) Create(body domain.CreateTransactionRequest) (doma
 	_, err = ts.TransactionRepository.CreateTransaction(transaction)
 	if err != nil {
 		return domain.Transaction{}, domain.InternalFailure(err) 
+	}
+
+	if err := tx.Commit(); err != nil {
+		return domain.Transaction{}, domain.InternalFailure(errors.New("Failed to commit: "+err.Error()))
 	}
 
 	return transaction, nil

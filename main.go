@@ -44,7 +44,7 @@ func main() {
 	server := web.NewServer(":"+os.Getenv("SERVER_PORT"), chi.NewMux())
 	server.AccountService = account.NewAccountService(database, database)
 	server.CustomerService = customer.NewCustomerService(database)
-	server.TransactionService = transactions.NewTransactionService(database, database)
+	server.TransactionService = transactions.NewTransactionService(database, database, database)
 
 	go func(server *web.Server){
 		if err := server.AccountService.UpdateBalanceDaily(); err != nil {
