@@ -1,4 +1,4 @@
-# Demo Bank Api Project
+# Demo Bank API Project
 
 ## Summary
 
