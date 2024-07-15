@@ -2,7 +2,7 @@
 
 ## Summary
 
-- This is a **demo** API for a banking system featuring **CRUD** operations for customers and accounts.
+- This is a **REST DEMO API** for a banking system featuring **CRUD** operations for customers and accounts.
 - Each customer can have multiple accounts.
 - The project is written in Go and follows hexagonal architecture.
 - Some endpoint are **authenticated** through token and the middleware is also validating if the customer owns the account they want to make a request with.
@@ -63,6 +63,10 @@ C:.
 - Hexagonal architecture promotes a modular and flexible design, making it easier to adapt to changing requirements, swap out components, and maintain the codebase over time.
 
 Overall, hexagonal architecture in Go fosters clean, modular, and testable code by focusing on separation of concerns and abstraction of external dependencies.
+
+## Notes
+
+In this project i have learned how to implement GO's hexagonal architecture, which is best suited for API's. I've learned how to create database queries and how to serialize and validate data. I've learned how to write tests, implement authetication middleware, logging middleware and CORS.
 
 ## Api Endpoints
 
