@@ -92,7 +92,7 @@ Expected Output:
 
 ### What About Tests?
 
-Glad you asked!. Make sure you have set the configuration for the test database in the **.env** file.
+Glad you asked! Make sure you have set the configuration for the test database in the **.env** file.
 
 Then run this command to run all tests:
 
