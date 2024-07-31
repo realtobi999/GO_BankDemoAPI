@@ -1,5 +1,40 @@
 # Demo Bank API Project
 
+## Table of Contents
+
+- **[Summary](#summary)**
+- **[How to Build?](#how-to-build)**
+  - **[What About Tests?](#what-about-tests)**
+- **[Architecture](#architecture)**
+  - **[Tree Overview](#tree-overview)**
+  - **[Core Business Logic - src/core](#core-business-logic---srccore)**
+  - **[Ports - src/core/ports](#ports---srccoreports)**
+  - **[Adapters - src/adapters](#adapters---srcadapters)**
+  - **[Dependency Injection](#dependency-injection)**
+  - **[Testing](#testing)**
+  - **[Flexibility and Maintainability](#flexibility-and-maintainability)**
+- **[Notes](#notes)**
+- **[Api Endpoints](#api-endpoints)**
+  - **[Success Response](#success-response)**
+  - **[Error Response](#error-response)**
+  - **[Authentication](#authentication)**
+  - **[Customer Endpoints](#customer-endpoints)**
+    - **[GET /api/customer](#get-apicustomer)**
+    - **[GET /api/customer/{customer_id}](#get-apicustomercustomer_id)**
+    - **[POST /api/customer](#post-apicustomer)**
+    - **[PUT /api/customer/{customer_id}](#put-apicustomercustomer_id)**
+    - **[DELETE /api/customer/{customer_id}](#delete-apicustomercustomer_id)**
+  - **[Account Endpoints](#account-endpoints)**
+    - **[GET /api/account](#get-apiaccount)**
+    - **[GET /api/account/{account_id}](#get-apiaccountaccount_id)**
+    - **[POST /api/{customer_id}/account](#post-apicustomer_idaccount)**
+    - **[PUT /api/{customer_id}/account/{account_id}](#put-apicustomer_idaccountaccount_id)**
+    - **[DELETE /api/{customer_id}/account/{account_id}](#delete-apicustomer_idaccountaccount_id)**
+  - **[Transaction Endpoints](#transaction-endpoints)**
+    - **[GET /api/transaction](#get-apitransaction)**
+    - **[GET /api/transaction/{transaction_id}](#get-apitransactiontransaction_id)**
+    - **[POST /api/{customer_id}/account/{account_id}/transaction`](#post-apicustomer_idaccountaccount_idtransaction)**
+
 ## Summary
 
 - This is a **REST DEMO API** for a banking system featuring **CRUD** operations for customers and accounts.
@@ -9,6 +44,65 @@
 - Accounts can conduct transactions, including currency exchange, and everything is stored in a **Postgres** database.
 - All API endpoints are thoroughly **tested** with over 30 tests in total.
 - Working system for updating saving accounts with their interest rate.
+
+## How To Build?
+
+You will need to have installed:
+
+- **GO 1.22.5 and higher**
+- **Postgres**
+
+After that clone the git repo into the desired folder like this:
+
+```bash
+git clone https://github.com/realtobi999/GO_BankDemoAPI.git
+```
+
+Before running the server, you must configure few things
+
+First rename **.env_example to .env** and with your favorite editor edit the **.env** file like this:
+
+```text
+SERVER_PORT=YOUR_PORT
+
+DB_HOST=YOUR_HOST
+DB_PORT=YOUR_POST
+DB_USERNAME=YOUR_USERNAME
+DB_PASSWORD=YOUR_PASSWORD
+DB_NAME=YOUR_DATABASE_NAME
+
+DB_TEST_HOST=
+DB_TEST_PORT=
+DB_TEST_USERNAME=
+DB_TEST_PASSWORD=
+DB_TEST_NAME=
+```
+
+Set the testing database settings the same way as your main one
+
+After that run this command to start the server:
+
+```bash
+make run
+```
+
+Expected Output:
+
+![expected_result](./doc/built_application.png)
+
+### What About Tests?
+
+Glad you asked!. Make sure you have set the configuration for the test database in the **.env** file.
+
+Then run this command to run all tests:
+
+```bash
+make test
+```
+
+Expected Output:
+
+![expected_tests_result](./doc/passed_tests.jpg)
 
 ## Architecture
 
